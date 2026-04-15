@@ -4,7 +4,7 @@
 development:
   no_provided_code:
     rule: "Subnet owners NEVER write miner code"
-    implication: "Miners read validator.py to understand interface"
+    implication: "Miners read validator code to understand interface"
     competition: "through innovation, not copying reference"
 
   open_source:
@@ -16,13 +16,16 @@ development:
 
 communication:
   deprecated:
-    - axon
     - dendrite
     - synapse
   
   recommended:
     protocol: http_rest
-    discovery: chain_commitments
+    discovery: axon
+    axon_points_at_one_of:
+      - miner
+      - WAF
+      - static_manifest_host
 
   endpoint_commitment:
     method: "subtensor.set_commitment(wallet, netuid, data)"

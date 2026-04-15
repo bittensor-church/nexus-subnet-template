@@ -5,14 +5,17 @@ description = ""
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "bittensor-nexus-lib",
+    "attrs>=26.1.0",
+    "bittensor-nexus-library",
+    "click>=8.3.2",
+    "python-dotenv>=1.2.2",
 ]
 
 [tool.uv]
 exclude-newer = "1 week"
 
 [tool.uv.sources]
-bittensor-nexus-lib = { git = "https://github.com/bittensor-church/nexus-poc.git", subdirectory = "nexus-template", branch = "kb" }
+bittensor-nexus-library = { git = "https://github.com/bittensor-church/bittensor-nexus-library.git" }
 
 [dependency-groups]
 dev = [

@@ -34,20 +34,18 @@ design_philosophy:
       - miners_compete_through_innovation
       - simplicity_breeds_auditability
     
-    single_file_pattern:
-      file: "validator.py"
-      contains:
-        - configuration
-        - miner_interface_spec
-        - discovery_method
-        - scoring_logic
-        - weight_setting
-        - main_loop
-      
-      excludes:
-        - miner_implementation
-        - reference_solutions
-        - shared_synapse_definitions
+    required_components:
+      - configuration
+      - miner_interface_spec
+      - discovery_method
+      - scoring_logic
+      - weight_setting
+      - main_loop
+
+    excludes:
+      - miner_implementation
+      - reference_solutions
+      - shared_synapse_definitions
 
 core_loop:
   realized_by: nexus_framework
@@ -92,7 +90,7 @@ scoring_patterns:
   
   tournament:
     formula: "1.0 - (rank / n)"
-  
+
 weight_setting:
   realized_by: "nexus weight setter → pylon (normalization, commit-reveal, retries)"
   normalization: "weights must sum to 1"
@@ -111,9 +109,8 @@ weight_setting:
     warning: "mature subnet problem, not default"
     realized_by: "pylon auto-detects commit-reveal from hyperparams, handles full flow"
     process:
-      1: "commit(hash(weights))"
-      2: "wait commit_reveal_period"
-      3: "reveal(weights)"
+      1: "pylon.commit(weights)"
+      2: "pylon handles the rest - fire and forget"
 
 anti_gaming:
   rate_gaming_detection:
