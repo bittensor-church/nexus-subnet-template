@@ -46,7 +46,7 @@ filterwarnings = [
 [tool.basedpyright]
 pythonVersion = "3.14"
 typeCheckingMode = "strict"
-include = ["validator.py", "tests"]
+include = ["validator/src", "validator/tests"]
 verboseOutput = true
 useLibraryCodeForTypes = true
 reportMissingTypeStubs = "warning"
@@ -55,4 +55,4 @@ reportUnusedImport = "warning"
 reportExplicitAny = "none"
 venvPath = "."
 venv = ".venv"
-extraPaths = [".venv/lib/python3.14/site-packages"]
+extraPaths = [".venv/lib/python3.14/site-packages", "validator/src"]
