@@ -19,6 +19,25 @@ knowledge/tasks.project-bootstrap.md file. It contains workflows for:
 If your task involves any of these, or the task is not clear, but it appears we are not done with the adapting
 yet, adhere strictly to the workflow described in that file and get that done first.
 
+# Project layout
+
+The repository is split into two `uv` projects plus shared infrastructure:
+
+- `validator/` — validator package + `Dockerfile`. **All validator code, `pyproject.toml`, `uv.lock`, and
+  `.venv` live here.** Run all dev/QA commands from `validator/` (e.g. `cd validator && uv sync`,
+  `cd validator && uv run basedpyright`).
+- `miner/` — reference miner skeleton (separate `uv` project; see `miner/README.md`). Not a production
+  image — the template intentionally provides no installer for miners.
+- `localnet/` — local subnet stack (subtensor + pylon) + miner fixtures (`localnet/miners/`).
+- `installer/` — operator-side `install.sh` + `update_compose.sh` (curl|bash flow for production hosts).
+- `envs/deployed/docker-compose.yml` — production stack (pylon + validator app); image pinned by digest.
+- `tools/update_compose_digest.py` — pin GHCR digest in deployed compose after each CI build.
+- `.github/workflows/` — `ci.yml` (QA on PR/main) and `build.yml` (push image to GHCR on
+  `deploy-build-<env>` branches).
+- `docs/deployment.md`, `knowledge/tasks.deployment.md` — deployment workflow and operator playbook.
+
+There is no root `pyproject.toml`. Do not try to run `uv` commands from the repo root.
+
 # Knowledge base
 
 ## Preparing for tasks
@@ -97,6 +116,15 @@ for higher level tasks that do not touch the code.
     - `uv add ...` / `uv remove ...` / `uv sync` (+ `--all-groups`, `--all-extras`)
     - `uv run --with foo,bar ...` (with temporary dependencies)
     - `uv run python -c '...'` / `uv run some/script.py` (code or script)
+    - **always `cd validator/` before `uv` commands for the validator** (or `cd miner/` for the miner).
+      There is no root `pyproject.toml`.
+
+# Deployment
+
+Production deployment uses two parallel branches per environment: `deploy-build-<env>` triggers the CI
+image build (`.github/workflows/build.yml`), and `deploy-config-<env>` is the source of truth for the
+operator-facing compose pulled by `installer/update_compose.sh`. Full workflow lives in
+`knowledge/tasks.deployment.md`.
 
 # Documentation rules
 
