@@ -42,3 +42,24 @@
 - all claims and instructions in READMEs verified and correct
 - subnet-specific artifacts, if relevant, proving the subnet's work prepared and presented to the user (but not
   committed)
+
+**after done:** start setting up production deployment
+
+# Setting Up Deployment
+
+**requires:** localnet works end-to-end
+**grounding knowledge:** ./knowledge/tasks.deployment.md
+**definition of done:**
+
+- `<OWNER>/<REPO>` and `<OWNER>/<SUBNET>` placeholders replaced everywhere; verified with
+  `grep -rn '<OWNER>/<REPO>\|<OWNER>/<SUBNET>' installer/ tools/ envs/ .github/`
+- GHCR access configured (default `GITHUB_TOKEN` for public images, PAT for private)
+- branch `deploy-build-prod` created; first CI build succeeds; image published in
+  `ghcr.io/<owner>/<repo>-prod`
+- `tools/update_compose_digest.py` runs locally and pins a digest into `envs/deployed/docker-compose.yml`
+- branch `deploy-config-prod` created with the pinned compose committed
+- `installer/install.sh` exercised on a clean VM (or VM-like container) end-to-end
+- root README.md updated with deployment pointer and post-fork checklist
+- `knowledge/tasks.deployment.md` reviewed and verified correct for this subnet
+
+**after done:** subnet is ready for production registration on Bittensor
