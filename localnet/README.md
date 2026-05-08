@@ -27,7 +27,7 @@ Creates owner and validator wallets, funds them from Alice (pre-funded devnet ac
 
 ```sh
 cp localnet/.env.example localnet/.env
-uv run python validator.py --env-file localnet/.env
+cd validator && uv run python -m validator --env-file ../localnet/.env
 ```
 
 The `localnet/.env.example` is pre-configured to connect to the local pylon.

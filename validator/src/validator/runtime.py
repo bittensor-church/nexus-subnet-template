@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from nexus.nexus_validator import NexusValidator
+from nexus.v1 import NexusValidator
 
 from validator.settings import Settings
 

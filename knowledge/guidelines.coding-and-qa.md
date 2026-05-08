@@ -14,9 +14,10 @@ Read nexus and pylon source from .venv when you need to research them - after ha
 
 ## QA gates
 
-All must pass. Run in order.
+All must pass. Run in order from the `validator/` directory (where the validator's `pyproject.toml` lives).
 
 ```sh
+cd validator
 uv run ruff check --fix && uv run ruff format
 uv run basedpyright
 uv run pytest -q --tb=line -r f
