@@ -51,18 +51,18 @@ curl -fsS https://raw.githubusercontent.com/<OWNER>/<REPO>/refs/heads/deploy-con
 
 ## Post-fork checklist
 
-After cloning/forking this template you **must** replace the `<OWNER>/<REPO>` placeholder in:
+After cloning/forking this template you **must** replace the `<OWNER>/<REPO>` raw GitHub URL placeholders
+and the `<OWNER_LOWER>/<REPO_LOWER>` GHCR image placeholders in:
 
 - `installer/install.sh`
 - `installer/update_compose.sh`
 - `tools/update_compose_digest.py`
 - `envs/deployed/docker-compose.yml`
-- `.github/workflows/build.yml` (if applicable)
 
 Verify nothing was missed:
 
 ```sh
-grep -rn '<OWNER>/<REPO>\|<OWNER>/<SUBNET>' installer/ tools/ envs/ .github/
+grep -rn '<OWNER>/<REPO>\|<OWNER_LOWER>/<REPO_LOWER>' README.md installer/ tools/ envs/ .github/ knowledge/tasks.deployment.md
 ```
 
 The placeholder is intentionally invalid (a `curl` against it returns 404) so a forgotten replacement
@@ -72,7 +72,7 @@ fails fast instead of silently pulling someone else's config.
 
 ```
 ┌────────────────────────┐    push    ┌─────────────────────┐    push     ┌─────────────────────┐
-│ developer commits to   │──────────▶│  CI: build.yml      │──image──▶│ ghcr.io/...:v0-latest│
+│ developer commits to   │──────────▶│  CI: build.yml      │──image──▶│ ghcr.io/...-<env>:v0-latest│
 │ deploy-build-<env>     │            │  push to GHCR       │             └──────────┬──────────┘
 └────────────────────────┘            └─────────────────────┘                        │
                                                                             update_compose_digest.py

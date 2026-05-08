@@ -8,7 +8,7 @@ The end goal is "operator runs one `curl ... | bash` and gets a healthy validato
 Two parallel branches per environment:
 
 - `deploy-build-<env>` — pushing here triggers `.github/workflows/build.yml`, which builds the validator
-  image and pushes it to `ghcr.io/<owner>/<repo>-<env>:v0-latest`. **No deploy happens.**
+  image and pushes it to `ghcr.io/<owner-lower>/<repo-lower>-<env>:v0-latest`. **No deploy happens.**
 - `deploy-config-<env>` — holds the operator-facing config (`envs/deployed/docker-compose.yml`,
   `installer/install.sh`, `installer/update_compose.sh`). Operator hosts cron-pull this branch every 15
   minutes and reconcile the local stack. **No build happens.**
@@ -18,7 +18,8 @@ without touching `prod` config and vice versa.
 
 ## One-time setup after forking the template
 
-1. Replace `<OWNER>/<REPO>` and `<OWNER>/<SUBNET>` placeholders in:
+1. Replace `<OWNER>/<REPO>` raw GitHub URL placeholders and `<OWNER_LOWER>/<REPO_LOWER>` GHCR image
+   placeholders in:
    - `installer/install.sh`
    - `installer/update_compose.sh`
    - `tools/update_compose_digest.py` (REPOSITORY_PREFIX)
@@ -27,7 +28,7 @@ without touching `prod` config and vice versa.
 
    Verify with:
    ```sh
-   grep -rn '<OWNER>/<REPO>\|<OWNER>/<SUBNET>' installer/ tools/ envs/ .github/
+   grep -rn '<OWNER>/<REPO>\|<OWNER_LOWER>/<REPO_LOWER>' README.md installer/ tools/ envs/ .github/ knowledge/tasks.deployment.md
    ```
 
 2. GHCR access:
@@ -37,16 +38,16 @@ without touching `prod` config and vice versa.
 
 3. Create the build branch and push:
    ```sh
-   git checkout -b deploy-build-prod main
+   git checkout -b deploy-build-prod master
    git push -u origin deploy-build-prod
    ```
    Watch `.github/workflows/build.yml` succeed and confirm the image appears in
-   `https://github.com/<OWNER>/<REPO>/pkgs/container/<repo>-prod`.
+   `https://github.com/<OWNER>/<REPO>/pkgs/container/<repo-lower>-prod`.
 
 4. Pin the digest into the deployed compose:
    ```sh
-   git checkout -b deploy-config-prod main
-   uv run --with - tools/update_compose_digest.py
+   git checkout -b deploy-config-prod master
+   uv run tools/update_compose_digest.py
    git add envs/deployed/docker-compose.yml
    git commit -m "chore: pin validator digest"
    git push -u origin deploy-config-prod
@@ -89,5 +90,5 @@ The `pylon` healthcheck must report healthy before `app` starts (compose `depend
   with a placeholder that *also* looks like a real path.
 - Wallets are mounted **read-only**. The container does not create them — they must already live under the
   configured `HOST_WALLET_DIR` on the host.
-- Images are pinned by digest, not tag. `:v0-latest` is only used as the digest source. Operator hosts pull
-  the compose by digest reference and never run an unpinned tag.
+- Images are pinned by digest, not tag. `:v0-latest` is only used as the validator digest source; update the
+  pylon digest deliberately when upgrading that sidecar.

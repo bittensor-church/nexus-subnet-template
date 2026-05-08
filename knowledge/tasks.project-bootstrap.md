@@ -51,11 +51,11 @@
 **grounding knowledge:** ./knowledge/tasks.deployment.md
 **definition of done:**
 
-- `<OWNER>/<REPO>` and `<OWNER>/<SUBNET>` placeholders replaced everywhere; verified with
-  `grep -rn '<OWNER>/<REPO>\|<OWNER>/<SUBNET>' installer/ tools/ envs/ .github/`
+- `<OWNER>/<REPO>` and `<OWNER_LOWER>/<REPO_LOWER>` placeholders replaced everywhere; verified with
+  `grep -rn '<OWNER>/<REPO>\|<OWNER_LOWER>/<REPO_LOWER>' README.md installer/ tools/ envs/ .github/ knowledge/tasks.deployment.md`
 - GHCR access configured (default `GITHUB_TOKEN` for public images, PAT for private)
 - branch `deploy-build-prod` created; first CI build succeeds; image published in
-  `ghcr.io/<owner>/<repo>-prod`
+  `ghcr.io/<owner-lower>/<repo-lower>-prod`
 - `tools/update_compose_digest.py` runs locally and pins a digest into `envs/deployed/docker-compose.yml`
 - branch `deploy-config-prod` created with the pinned compose committed
 - `installer/install.sh` exercised on a clean VM (or VM-like container) end-to-end

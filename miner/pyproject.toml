@@ -5,11 +5,10 @@ description = "Reference miner skeleton for the nexus-subnet-template."
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "bittensor",
-    "bittensor-wallet",
     "click>=8.3.2",
     "httpx",
     "litestar[standard]",
+    "pydantic",
 ]
 
 [build-system]

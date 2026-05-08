@@ -21,7 +21,7 @@ jobs:
 
       - name: Compute image repository
         run: |
-          repo_name="${GITHUB_REPOSITORY#*/}"
+          repo_name="$(echo "${GITHUB_REPOSITORY#*/}" | tr '[:upper:]' '[:lower:]')"
           owner="$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')"
           echo "IMAGE=ghcr.io/${owner}/${repo_name}-${ENVIRONMENT}:v0-latest" >> "${GITHUB_ENV}"
 

@@ -85,8 +85,8 @@ digest to `deploy-config-<env>` → operator hosts cron-pull within 15 minutes).
 
 ## Post-fork checklist
 
-After cloning/forking this template, replace the `<OWNER>/<REPO>` and `<OWNER>/<SUBNET>` placeholders
-across:
+After cloning/forking this template, replace the `<OWNER>/<REPO>` raw GitHub URL placeholders and the
+`<OWNER_LOWER>/<REPO_LOWER>` GHCR image placeholders across:
 
 - `installer/install.sh`
 - `installer/update_compose.sh`
@@ -97,8 +97,7 @@ across:
 Verify with:
 
 ```sh
-grep -rn '<OWNER>/<REPO>\|<OWNER>/<SUBNET>' installer/ tools/ envs/ .github/
+grep -rn '<OWNER>/<REPO>\|<OWNER_LOWER>/<REPO_LOWER>' README.md installer/ tools/ envs/ .github/ knowledge/tasks.deployment.md
 ```
 
 The placeholder is intentionally invalid (returns 404 from `curl`) so a forgotten replacement fails fast.
-

@@ -6,7 +6,7 @@ Examples:
     python tools/update_compose_digest.py --environment staging
     python tools/update_compose_digest.py --compose-path path/to/docker-compose.yml
 
-FIXME(template): replace <OWNER>/<SUBNET> in REPOSITORY_PREFIX with your fork after cloning the template.
+FIXME(template): replace <OWNER_LOWER>/<REPO_LOWER> in REPOSITORY_PREFIX with your fork after cloning the template.
 The placeholder is intentionally invalid so an unpinned digest fetch fails fast.
 """
 
@@ -19,7 +19,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPOSITORY_PREFIX = "ghcr.io/<OWNER>/<SUBNET>"
+REPOSITORY_PREFIX = "ghcr.io/<OWNER_LOWER>/<REPO_LOWER>"
 TAG = "v0-latest"
 
 

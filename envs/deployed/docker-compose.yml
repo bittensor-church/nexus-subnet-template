@@ -1,13 +1,14 @@
 # Production validator stack.
 #
-# Image is pinned by digest; tools/update_compose_digest.py rewrites the digest
-# after each successful build pushed to deploy-build-<env>.
+# Validator image is pinned by digest; tools/update_compose_digest.py rewrites
+# the digest after each successful build pushed to deploy-build-<env>.
+# Pylon is also pinned; update its digest deliberately when upgrading the sidecar.
 #
-# FIXME(template): replace <OWNER>/<SUBNET> below with your fork after cloning the template.
+# FIXME(template): replace <OWNER_LOWER>/<REPO_LOWER> below with your fork after cloning the template.
 
 services:
   pylon:
-    image: backenddevelopersltd/bittensor-pylon:latest
+    image: backenddevelopersltd/bittensor-pylon@sha256:5ed81aff1145dff08979e7802c76746818ce32fed53e4658091eb739cb5742c0
     pull_policy: always
     init: true
     restart: unless-stopped
@@ -34,7 +35,7 @@ services:
         tag: "{{.Name}}"
 
   app:
-    image: ghcr.io/<OWNER>/<SUBNET>-prod:v0-latest
+    image: ghcr.io/<OWNER_LOWER>/<REPO_LOWER>-prod:v0-latest
     pull_policy: always
     init: true
     restart: unless-stopped

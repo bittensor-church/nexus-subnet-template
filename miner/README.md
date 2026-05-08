@@ -7,13 +7,12 @@
 ## What's here
 
 - `src/miner_reference/template.py` — minimal HTTP miner accepting validator requests on `TARGET_PATH` and
-  posting the result back to the supplied `callback_url`. Self-registers on the configured subnet.
+  posting the result back to the supplied `callback_url`.
 
 ## What this is NOT
 
-- It is **not** the same as `../localnet/miners/miner.template.py`, which is a localnet test fixture intended
-  for use with `uv run` directly (it carries a PEP-723 script header). The two files happen to share their
-  initial contents — if you change one, decide whether to keep them in sync.
+- It is **not** the same as `../localnet/miners/miner.template.py`, which is a localnet test fixture that
+  creates wallets, funds them from Alice, and self-registers miners on the local chain.
 - There is **no** `installer/` workflow for the miner in this template. Miner deployment is intentionally
   left to subnet operators.
 
@@ -32,7 +31,9 @@ Edit `template.py`:
 - `MINER_NAME` — identifier reported in logs / wallet name.
 - `TARGET_PATH` — must match the validator's expected endpoint (see `nexus.v1` `AsyncHttpNeuronCommunicator`).
 - `handle_request()` — implement your subnet's miner-side logic.
-- `NETUID`, `SUBTENSOR_NETWORK` — point at the network you want to register on.
+
+This skeleton only models the HTTP request/callback contract. Registering axon info, managing wallets, and
+operating a long-running miner process are intentionally left to the subnet-specific miner implementation.
 
 Once you have a working miner, package and deploy it however you prefer — Docker image, raw `uv run`,
 systemd unit, etc.
