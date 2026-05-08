@@ -1,0 +1,51 @@
+# Production validator stack.
+#
+# Image is pinned by digest; tools/update_compose_digest.py rewrites the digest
+# after each successful build pushed to deploy-build-<env>.
+#
+# FIXME(template): replace <OWNER>/<SUBNET> below with your fork after cloning the template.
+
+services:
+  pylon:
+    image: backenddevelopersltd/bittensor-pylon:latest
+    pull_policy: always
+    init: true
+    restart: unless-stopped
+    environment:
+      PYLON_BITTENSOR_NETWORK: "${BITTENSOR_NETWORK:?}"
+      PYLON_OPEN_ACCESS_TOKEN: "${VALIDATOR_PYLON_OPEN_ACCESS_TOKEN:?}"
+      PYLON_IDENTITIES: '["${VALIDATOR_PYLON_IDENTITY_NAME:-validator}"]'
+      PYLON_BITTENSOR_WALLET_PATH: "/wallets"
+      PYLON_TEMPO: "${SUBNET_TEMPO:?}"
+      PYLON_ID_VALIDATOR_WALLET_NAME: "${BITTENSOR_WALLET_NAME:?}"
+      PYLON_ID_VALIDATOR_HOTKEY_NAME: "${BITTENSOR_WALLET_HOTKEY_NAME:?}"
+      PYLON_ID_VALIDATOR_NETUID: "${BITTENSOR_NETUID:?}"
+      PYLON_ID_VALIDATOR_TOKEN: "${VALIDATOR_PYLON_IDENTITY_TOKEN:?}"
+    volumes:
+      - "${HOST_WALLET_DIR:?}:/wallets:ro"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/8000'"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    logging: &logging
+      driver: journald
+      options:
+        tag: "{{.Name}}"
+
+  app:
+    image: ghcr.io/<OWNER>/<SUBNET>-prod:v0-latest
+    pull_policy: always
+    init: true
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      VALIDATOR_PYLON_SERVICE_ADDRESS: "http://pylon:8000"
+      VALIDATOR_PYLON_IDENTITY_NAME: "${VALIDATOR_PYLON_IDENTITY_NAME:-validator}"
+    volumes:
+      - "${HOST_WALLET_DIR:?}:/root/.bittensor/wallets:ro"
+    depends_on:
+      pylon:
+        condition: service_healthy
+    logging:
+      <<: *logging
