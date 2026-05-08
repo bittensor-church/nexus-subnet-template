@@ -4,17 +4,9 @@ from pathlib import Path
 
 import click
 from dotenv import load_dotenv
-from nexus.nexus_validator import NexusValidator
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="VALIDATOR_", extra="ignore")
-
-
-class Validator(NexusValidator):
-    def __init__(self, settings: Settings) -> None:
-        super().__init__(settings)
+from validator.runtime import Validator
+from validator.settings import Settings
 
 
 @click.command()
