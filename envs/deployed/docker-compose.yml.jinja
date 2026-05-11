@@ -1,0 +1,26 @@
+services:
+  pylon:
+    image: backenddevelopersltd/bittensor-pylon:latest
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      PYLON_BITTENSOR_NETWORK: "${BITTENSOR_NETWORK:?}"
+      PYLON_OPEN_ACCESS_TOKEN: "${VALIDATOR_PYLON_OPEN_ACCESS_TOKEN:?}"
+      PYLON_IDENTITIES: '["validator"]'
+      PYLON_BITTENSOR_WALLET_PATH: "/wallets"
+      PYLON_TEMPO: "360"
+      PYLON_ID_VALIDATOR_WALLET_NAME: "${BITTENSOR_WALLET_NAME:?}"
+      PYLON_ID_VALIDATOR_HOTKEY_NAME: "${BITTENSOR_WALLET_HOTKEY_NAME:?}"
+      PYLON_ID_VALIDATOR_NETUID: "${NETUID:?}"
+      PYLON_ID_VALIDATOR_TOKEN: "${VALIDATOR_PYLON_OPEN_ACCESS_TOKEN:?}"
+    volumes:
+      - "${HOST_WALLET_DIR:?}:/wallets:ro"
+
+  validator:
+    image: {{ image_registry }}/{{ github_org | lower }}/{{ image_basename }}-${ENVIRONMENT:?}:v0-latest
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      VALIDATOR_PYLON_SERVICE_ADDRESS: "http://pylon:8000"
+    depends_on:
+      - pylon

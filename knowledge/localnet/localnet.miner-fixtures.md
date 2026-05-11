@@ -1,5 +1,8 @@
 # Miner Fixtures
 
+Miner fixtures are NOT the production miner. The production miner lives in `/miner` (separate uv project).
+The fixtures described here are localnet-only profile simulators that stand in for various miner behaviors.
+
 Miner fixtures are local-only scripts that stand in for miners so the validator can be exercised end-to-end on localnet.
 Each fixture is one profile — one behavior the subnet needs to observe to verify its scoring. They are not reference
 implementations, not suggested mining strategies, and never ship as production code; their job is to make the subnet

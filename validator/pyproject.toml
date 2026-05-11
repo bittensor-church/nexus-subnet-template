@@ -1,15 +1,22 @@
 [project]
-name = ""
+name = "validator"
 version = "0.1.0"
-description = ""
-readme = "README.md"
+description = "Nexus-based Bittensor subnet validator."
 requires-python = ">=3.14"
 dependencies = [
     "attrs>=26.1.0",
     "bittensor-nexus-library",
     "click>=8.3.2",
+    "pydantic-settings>=2.14.0",
     "python-dotenv>=1.2.2",
 ]
+
+[project.scripts]
+validator = "validator.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.uv]
 exclude-newer = "1 week"
@@ -46,7 +53,7 @@ filterwarnings = [
 [tool.basedpyright]
 pythonVersion = "3.14"
 typeCheckingMode = "strict"
-include = ["validator.py", "tests"]
+include = ["src", "tests"]
 verboseOutput = true
 useLibraryCodeForTypes = true
 reportMissingTypeStubs = "warning"
@@ -55,4 +62,4 @@ reportUnusedImport = "warning"
 reportExplicitAny = "none"
 venvPath = "."
 venv = ".venv"
-extraPaths = [".venv/lib/python3.14/site-packages"]
+extraPaths = ["src", ".venv/lib/python3.14/site-packages"]

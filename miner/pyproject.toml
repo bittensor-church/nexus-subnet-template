@@ -1,0 +1,66 @@
+[project]
+name = "miner"
+version = "0.1.0"
+description = "Bittensor subnet miner."
+requires-python = ">=3.14"
+dependencies = [
+    "bittensor",
+    "bittensor-wallet",
+    "click>=8.3.2",
+    "httpx",
+    "litestar[standard]",
+    "pydantic>=2.13.0",
+    "uvicorn",
+]
+
+[project.scripts]
+miner = "miner:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["miner.py"]
+
+[tool.uv]
+exclude-newer = "1 week"
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.36.1",
+    "ruff",
+    "pytest",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "TC005"]
+preview = true
+explicit-preview-rules = true
+extend-select = ["DOC501"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["I", "F401"]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error::pytest.PytestUnhandledThreadExceptionWarning",
+]
+
+[tool.basedpyright]
+pythonVersion = "3.14"
+typeCheckingMode = "strict"
+include = ["miner.py", "tests"]
+verboseOutput = true
+useLibraryCodeForTypes = true
+reportMissingTypeStubs = "warning"
+reportUndefinedVariable = "error"
+reportUnusedImport = "warning"
+reportExplicitAny = "none"
+venvPath = "."
+venv = ".venv"
+extraPaths = [".venv/lib/python3.14/site-packages"]

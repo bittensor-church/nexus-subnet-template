@@ -1,0 +1,64 @@
+# {{ subnet_name }} Validator
+
+Validator node for the {{ subnet_name }} Bittensor subnet. This document is for **operators**
+who want to run a validator on their own host.
+
+## Quick install
+
+On a clean Linux host with Docker, Docker Compose, `cron`, `curl`, `bash`, and
+`openssl`:
+
+```bash
+curl -s https://raw.githubusercontent.com/{{ github_org }}/{{ github_repo }}/refs/heads/deploy-config-prod/installer/install.sh | bash
+```
+
+The installer will:
+
+1. Create a working directory at `~/{{ working_dir_name }}/`.
+2. Prompt for wallet and network settings on first run and write them to `.env`.
+3. Pull the latest `docker-compose.yml` from the `deploy-config-prod` branch and start
+   the validator + pylon stack.
+4. Install a cron job that re-syncs `docker-compose.yml` every 15 minutes so the
+   validator image stays up to date.
+
+## What this installs
+
+Two containers managed by `docker compose`:
+
+- **pylon** — sidecar that proxies all Bittensor / subtensor communication for the
+  validator (handles wallet, weight setting, metagraph reads).
+- **validator** — the {{ subnet_name }} validator process built from this repo.
+
+## Wallet & `.env`
+
+You need the validator wallet and hotkey on disk before installing. The wallet
+should be funded and registered as needed for the target network and netuid. By
+default the installer mounts `~/.bittensor/wallets` read-only into pylon.
+
+On first run the installer asks for:
+
+- `BITTENSOR_NETWORK` (default `{{ default_network }}`)
+- `HOST_WALLET_DIR` (default `~/.bittensor/wallets`)
+- `BITTENSOR_WALLET_NAME` (default `validator`)
+- `BITTENSOR_WALLET_HOTKEY_NAME` (default `default`)
+
+`ENVIRONMENT` defaults to the install environment (`prod` for quick install),
+`NETUID` defaults to `{{ default_netuid }}`, and `VALIDATOR_PYLON_OPEN_ACCESS_TOKEN`
+is auto-generated. See [`installer/README.md`](../installer/README.md) for the full
+variable reference.
+
+## Updates
+
+The cron job re-runs the update script every 15 minutes; validator updates
+promoted through the `deploy-config-prod` branch propagate automatically. To
+force an update sooner:
+
+```bash
+curl -s https://raw.githubusercontent.com/{{ github_org }}/{{ github_repo }}/refs/heads/deploy-config-prod/installer/update_compose.sh | bash
+```
+
+## More
+
+- [`installer/README.md`](../installer/README.md) — full installer reference: custom
+  working directory, custom environment branch, image rolling, manual updates.
+- Repository root `README.md` — what {{ subnet_name }} is and how the subnet works.
