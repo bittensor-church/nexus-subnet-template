@@ -15,7 +15,7 @@ dependencies = [
 exclude-newer = "1 week"
 
 [tool.uv.sources]
-bittensor-nexus-library = { git = "https://github.com/bittensor-church/bittensor-nexus-library.git", branch = "kb" }
+bittensor-nexus-library = { git = "https://github.com/bittensor-church/bittensor-nexus-library.git" }
 
 [dependency-groups]
 dev = [

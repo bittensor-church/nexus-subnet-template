@@ -28,7 +28,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "attrs", specifier = ">=26.1.0" },
-    { name = "bittensor-nexus-library", git = "https://github.com/bittensor-church/bittensor-nexus-library.git?branch=kb" },
+    { name = "bittensor-nexus-library", git = "https://github.com/bittensor-church/bittensor-nexus-library.git" },
     { name = "click", specifier = ">=8.3.2" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
 ]
@@ -97,8 +97,8 @@ wheels = [
 
 [[package]]
 name = "bittensor-nexus-library"
-version = "0.0.1.dev162+g87ab425fb"
-source = { git = "https://github.com/bittensor-church/bittensor-nexus-library.git?branch=kb#87ab425fb6aa66054d7cf873abab822bf5742774" }
+version = "0.0.1.dev162+gb6f4814eb"
+source = { git = "https://github.com/bittensor-church/bittensor-nexus-library.git#b6f4814eb4e1c4eab85f428b2b1008f66f2730e8" }
 dependencies = [
     { name = "bittensor-pylon-client" },
     { name = "boto3" },
