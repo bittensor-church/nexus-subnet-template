@@ -18,6 +18,7 @@ from nexus.v1 import (
 from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from validator.metrics import start_metrics_server
 from validator.payload import PingInput, PingPayloadCreator, PongOutput
 from validator.response_logger import ErrorLoggerNode, ResponseLoggerNode
 
@@ -33,6 +34,7 @@ class Settings(BaseSettings):
     send_timeout: timedelta = timedelta(seconds=2)
     total_processing_timeout: timedelta = timedelta(seconds=10)
     max_in_flight: int = 4
+    metrics_port: int = 9080
 
 
 class Validator(NexusValidator):
@@ -77,6 +79,7 @@ class Validator(NexusValidator):
 def main(env_file: Path | None) -> None:
     """CLI entry point: load env from --env-file (if given) and run the validator."""
     load_dotenv(env_file)
+    start_metrics_server(Settings().metrics_port)
     Validator.run(settings_class=Settings)
 
 

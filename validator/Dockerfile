@@ -32,4 +32,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY --from=builder /opt/venv /opt/venv
 
+EXPOSE 9080
+
 CMD ["validator"]

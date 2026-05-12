@@ -941,6 +941,7 @@ dependencies = [
     { name = "attrs" },
     { name = "bittensor-nexus-library" },
     { name = "click" },
+    { name = "prometheus-client" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
 ]
@@ -958,6 +959,7 @@ requires-dist = [
     { name = "attrs", specifier = ">=26.1.0" },
     { name = "bittensor-nexus-library", git = "https://github.com/bittensor-church/bittensor-nexus-library.git" },
     { name = "click", specifier = ">=8.3.2" },
+    { name = "prometheus-client", specifier = ">=0.25.0" },
     { name = "pydantic-settings", specifier = ">=2.14.0" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
 ]

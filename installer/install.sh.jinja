@@ -27,7 +27,12 @@ if [ ! -f "${ENV_FILE}" ]; then
     BITTENSOR_WALLET_HOTKEY_NAME=${BITTENSOR_WALLET_HOTKEY_NAME:-default}
 
     VALIDATOR_PYLON_OPEN_ACCESS_TOKEN=$(openssl rand -hex 32)
+    PYLON_METRICS_TOKEN=$(openssl rand -hex 32)
+    SECRET_KEY=$(openssl rand -hex 32)
     NETUID={{ default_netuid }}
+
+    read -r -p "Enter SENTRY_DSN (optional, press Enter to skip): " SENTRY_DSN </dev/tty
+    SENTRY_DSN=${SENTRY_DSN:-}
 
     cat > "${ENV_FILE}" << EOL
 NETUID=${NETUID}
@@ -37,6 +42,9 @@ BITTENSOR_WALLET_HOTKEY_NAME=${BITTENSOR_WALLET_HOTKEY_NAME}
 HOST_WALLET_DIR=${HOST_WALLET_DIR}
 ENVIRONMENT=${ENV_NAME}
 VALIDATOR_PYLON_OPEN_ACCESS_TOKEN=${VALIDATOR_PYLON_OPEN_ACCESS_TOKEN}
+PYLON_METRICS_TOKEN=${PYLON_METRICS_TOKEN}
+SECRET_KEY=${SECRET_KEY}
+SENTRY_DSN=${SENTRY_DSN}
 EOL
 
     echo ".env file created successfully."
