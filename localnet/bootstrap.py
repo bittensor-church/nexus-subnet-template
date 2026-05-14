@@ -150,7 +150,7 @@ def create_and_activate_subnet(subtensor: bt.Subtensor, owner: Wallet) -> int:
 
     # Activate the subnet — must wait for start_call delay
     current_block = subtensor.get_current_block()
-    delay_blocks = subtensor.get_start_call_delay().value
+    delay_blocks = subtensor.get_start_call_delay()
     target_block = current_block + delay_blocks + 1
     print(f"Waiting {delay_blocks} blocks to activate subnet (current: {current_block}, target: {target_block})...")
     subtensor.wait_for_block(target_block)
