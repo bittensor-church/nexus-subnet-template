@@ -35,16 +35,10 @@ changing tooling config, keep both in sync.
 
 ## Adapting this repository to a new subnet
 
-This template has to be adapted to an actual project at some point.
+This template has to be adapted to an actual project at some point. When starting out, refer to the
+knowledge/tasks.project-bootstrap.md file. It contains workflows for:
 
-**Before any subnet-specific work in an unrendered template checkout**, parameterize
-the template with Copier — see `knowledge/template.bootstrap.md` for how to detect
-whether this is the template checkout or a rendered-but-not-adapted repo, run
-`copier copy`, and what to do after rendering.
-
-Once the template is rendered, refer to the knowledge/tasks.project-bootstrap.md file.
-It contains workflows for:
-
+- Bootstrapping the template
 - Designing the subnet
 - Implementing the validator
 - Setting up localnet

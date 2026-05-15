@@ -30,6 +30,7 @@ Never loosen any basedpyright rules – globally or locally.
 - Short, concise code. Avoid deep nesting
 - Prefer well-typed code:
     - prefer typed structures (dataclass, BaseModel, NamedTuple) over raw dicts, lists, tuples
+- Prefer out-of-the-box nexus components over writing your own ones.
 - Avoid primitive types, especially:
     - use NewType or typed wrappers for semantic values
     - use DateTime, Date, Time, timedelta for date/time related values

@@ -2,6 +2,29 @@
 
 This directory contains scripts to install and maintain a {{ subnet_name }} validator node.
 
+## Prerequisites
+
+- Docker and Docker Compose installed.
+- `cron` running.
+- `curl`, `bash`, and `openssl`.
+- Internet access to GitHub and the configured container registry.
+- Validator wallet with hotkey on disk, funded and registered as needed for the
+  target network and netuid (default location: `~/.bittensor/wallets`).
+  **Coldkey is not required for the validator** so for increased security it should not be present on the validator
+  machine.
+  The recommended layout looks like this:
+
+  ```
+    ~/.bittensor/
+    └── wallets/
+        └── <coldkey-name>/
+            ├── coldkeypub.txt          # public only; OK on validator machine
+            └── hotkeys/
+                └── <hotkey-name>       # private hotkey material; protect this
+  ```
+    There should be no file here:
+    ~/.bittensor/wallets/<coldkey-name>/coldkey
+
 ## Quick Installation
 
 ```bash
@@ -13,6 +36,24 @@ This will:
 2. Prompt you for configuration values if `.env` does not exist.
 3. Fetch and run `update_compose.sh` once to set up `docker-compose.yml` and start the stack.
 4. Install a cron job that re-runs `update_compose.sh` every 15 minutes so the validator stays up to date.
+
+On first run the installer asks for:
+
+- `BITTENSOR_NETWORK` (default `{{ default_network }}`)
+- `HOST_WALLET_DIR` (default `~/.bittensor/wallets`)
+- `BITTENSOR_WALLET_NAME` (default `validator`)
+- `BITTENSOR_WALLET_HOTKEY_NAME` (default `default`)
+
+### Environment Variables
+
+Written to `<WORKING_DIRECTORY>/.env` on first run:
+
+- `NETUID` — subnet netuid (default: `{{ default_netuid }}`).
+- `BITTENSOR_NETWORK` — Bittensor network address (e.g. `finney`, `ws://localhost:9944`).
+- `BITTENSOR_WALLET_NAME` / `BITTENSOR_WALLET_HOTKEY_NAME` — wallet identifiers consumed by pylon.
+- `HOST_WALLET_DIR` — host-side path to the Bittensor wallets directory (mounted read-only into pylon).
+- `ENVIRONMENT` — deploy environment suffix used in the validator image name (default: `prod`).
+- `VALIDATOR_PYLON_OPEN_ACCESS_TOKEN` — auto-generated 32-byte hex token shared between validator and pylon.
 
 ## Custom Installation
 
@@ -29,65 +70,12 @@ Example:
 curl -s https://raw.githubusercontent.com/{{ github_org }}/{{ github_repo }}/refs/heads/deploy-config-prod/installer/install.sh | bash -s -- prod /opt/{{ working_dir_name }}
 ```
 
-## Prerequisites
+## Updates
 
-- Docker and Docker Compose installed.
-- `cron` running.
-- `curl`, `bash`, and `openssl`.
-- Validator wallet and hotkey on disk, funded and registered as needed for the
-  target network and netuid (default location: `~/.bittensor/wallets`).
-- Internet access to GitHub and the configured container registry.
-
-## Container Registry Credentials
-
-The `Build validator image` workflow pushes the validator image to
-`{{ image_registry }}/{{ github_org | lower }}/`. It authenticates using:
-
-{% if image_registry == "ghcr.io" %}
-- `username: {{ '${{ github.actor }}' }}`
-- `password: {{ '${{ secrets.GITHUB_TOKEN }}' }}`
-
-`GITHUB_TOKEN` is provided automatically by GitHub Actions; the workflow already
-declares `packages: write`, so no extra secrets are required for the default
-GitHub Container Registry setup.
-{% else %}
-- `username: {{ '${{ secrets.REGISTRY_USERNAME }}' }}`
-- `password: {{ '${{ secrets.REGISTRY_PASSWORD }}' }}`
-
-Configure both secrets in your GitHub repository under
-`Settings → Secrets and variables → Actions` for
-`{{ github_org }}/{{ github_repo }}`. The credentials must allow pushing to
-`{{ image_registry }}/{{ github_org | lower }}/`.
-
-Note: registries that require a non-`docker/login-action` flow (e.g. AWS ECR,
-Google Artifact Registry with Workload Identity Federation) are not covered by
-this template — adjust the workflow manually if you target them.
-{% endif %}
-
-## Environment Variables
-
-Written to `<WORKING_DIRECTORY>/.env` on first run:
-
-- `NETUID` — subnet netuid (default: `{{ default_netuid }}`).
-- `BITTENSOR_NETWORK` — Bittensor network alias (e.g. `finney`, `test`, `local`).
-- `BITTENSOR_WALLET_NAME` / `BITTENSOR_WALLET_HOTKEY_NAME` — wallet identifiers consumed by pylon.
-- `HOST_WALLET_DIR` — host-side path to the Bittensor wallets directory (mounted read-only into pylon).
-- `ENVIRONMENT` — deploy environment suffix used in the validator image name (default: `prod`).
-- `VALIDATOR_PYLON_OPEN_ACCESS_TOKEN` — auto-generated 32-byte hex token shared between validator and pylon.
+The validator updates itself automatically every 15 minutes via the cron job installed by the installer script.
 
 ## Manual Update
 
 ```bash
 curl -s https://raw.githubusercontent.com/{{ github_org }}/{{ github_repo }}/refs/heads/deploy-config-prod/installer/update_compose.sh | bash -s -- [ENV_NAME] [WORKING_DIRECTORY]
 ```
-
-## Image Rolling
-
-The validator image name is environment-scoped:
-`{{ image_registry }}/{{ github_org | lower }}/{{ image_basename }}-${ENVIRONMENT}`.
-The initial `docker-compose.yml` can use the `v0-latest` tag as a bootstrap
-placeholder for the first operator rollout. After bootstrap, promote releases
-only by pinning an immutable image digest
-(`{{ image_registry }}/{{ github_org | lower }}/{{ image_basename }}-${ENVIRONMENT}@sha256:...`)
-in `deploy-config-prod`; the cron job on every operator host will pick it up
-within 15 minutes.

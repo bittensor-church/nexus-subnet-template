@@ -1,3 +1,15 @@
+# Template bootstrap
+
+**requires:** repo cloned locally
+**grounding knowledge:** knowledge/template.bootstrap.md
+**do not load:** bittensor, nexus, pylon, localnet, coding guidelines
+**definition of done:**
+
+- repository state detected (unrendered template / in-place cleanup pending / rendered-but-not-adapted)
+- post-render checklist passes as described in `knowledge/template.bootstrap.md`
+
+**after done:** start designing the subnet
+
 # Designing Subnet
 
 **requires:** user's subnet idea
@@ -50,21 +62,26 @@
 
 # Deploying Validator
 
-**requires:** localnet running end-to-end
-**grounding knowledge:** none new (`installer/README.md.jinja` and `copier.yml` describe the inputs;
-`knowledge/template.bootstrap.md` is the source of truth for *how* to invoke Copier — fresh-directory
-render is preferred, in-place requires a mandatory cleanup)
+**requires:** localnet running end-to-end; `master` ready for release (QA gates pass; root
+`README.md`, `validator/README.md`, `installer/README.md`, and `AGENTS.md` consistent with the
+current state of the subnet); `validator/Dockerfile` builds locally without errors
+**grounding knowledge:** `knowledge/validator.deploy.md` 
 **definition of done:**
 
-- `copier copy . <dest>` (or `copier copy gh:<org>/<repo> <dest>`) renders cleanly with answers
-  appropriate for this subnet; rendered files committed to master
-- `validator/Dockerfile` builds locally without errors
-- `.github/workflows/build-validator.yml` pushes a validator image to the configured registry on push
-  to a `deploy-build-prod` branch
-- branch `deploy-config-prod` exists and contains the rendered repo; the operator-critical files are the
-  rendered `installer/install.sh`, `installer/update_compose.sh`, and `envs/deployed/docker-compose.yml`
-- `envs/deployed/docker-compose.yml` points at the intended environment-scoped validator image
-  (`{{ image_basename }}-${ENVIRONMENT}:v0-latest` is acceptable as the first bootstrap placeholder;
-  pin `{{ image_basename }}-${ENVIRONMENT}@sha256:...` once a release is promoted)
-- `bash installer/install.sh` succeeds on a clean Linux host: validator and pylon services come up
-  healthy, `crontab -l` shows the cron line tagged with the configured cron tag
+- `validator/Dockerfile` built locally without errors as a sanity check before promotion
+- the `build-validator.yml` workflow finished successfully and pushed the image
+  `<image_registry>/<github_org>/<image_basename>-prod:v0-latest` and
+  `...:sha-<commit>` to the configured registry
+- `envs/deployed/docker-compose.yml` on `master` (and therefore on `deploy-config-prod` after
+  promotion) pins the validator image by registry digest (`...@sha256:<digest>`, where `<digest>`
+  is the Docker image manifest SHA256, not a git commit SHA), so operators run exactly the image
+  the developer smoke-tested
+- branch `deploy-config-prod` points at the same commit as `master`, so an operator pulling
+  `installer/install.sh` from this branch gets a consistent set of installer, `update_compose.sh`,
+  and `docker-compose.yml`
+- smoke test: `bash installer/install.sh` on a clean Linux host (a fresh VM or container, not
+  the developer's laptop) succeeds — validator and pylon services come up healthy and `crontab -l`
+  shows the cron line tagged with the configured cron tag
+
+**after done:** workflow is complete; subsequent releases are repeats of the
+promotion procedure in `knowledge/validator.deploy.md`.

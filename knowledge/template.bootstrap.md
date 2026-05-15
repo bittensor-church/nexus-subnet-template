@@ -4,10 +4,9 @@ The source checkout for this repository is a **Copier template**. Before any
 subnet-specific work in a template checkout, it must be parameterized for the
 target subnet.
 
-This document is the source of truth for *how* to render the template. Other
-docs (`AGENTS.md`, `knowledge/tasks.project-bootstrap.md`) may mention the
-`copier copy` command in passing — when in doubt about the mechanics, follow
-this file.
+This document is the source of truth for *how* to render the template. It is the
+grounding knowledge for the "Template bootstrap" task in
+`knowledge/tasks.project-bootstrap.md`.
 
 ## How to detect the repository state
 
@@ -153,30 +152,6 @@ It is **not** OK if:
   yourself. The only legitimate path from `*.jinja` to a rendered file is
   `copier copy`. If a previous attempt did this by hand, restore the original
   `*.jinja` files (e.g. `git restore`) and run `copier copy` properly.
-
-## After rendering — what an agent should do
-
-1. **Root `README.md`** — replace the Nexus-framework template content with a
-   short description of the actual subnet (what it does, what miners produce,
-   what validators measure). Follow the `Implementing Validator` workflow in
-   `knowledge/tasks.project-bootstrap.md`.
-2. **`validator/README.md`** — already a good operator-facing base (rendered
-   with the subnet's name and GitHub coordinates). Extend with subnet-specific
-   operator info (hardware requirements, extra env vars, post-install steps)
-   if needed. Do **not** duplicate the subnet description here — that belongs
-   in the root README.
-3. **`AGENTS.md`** — update the `Context` section: drop the "this is a
-   template" notice, add a one-line note that the project originated from this
-   template, and a short subnet description.
-4. **Template config** — rendered repos do not contain `copier.yml`. The
-   rendered tree should never grow one back. In the *template* checkout,
-   `copier.yml` is touched only when you add new template parameters that
-   future renders should configure. Day-to-day subnet work does not modify it.
-
-The source template currently does not keep Copier update metadata
-(`.copier-answers.yml`) in rendered repos. If upstream template changes are
-needed later, re-render into a fresh directory or port the changes manually
-unless the Copier config is extended to support `copier update`.
 
 ## What NOT to do
 
