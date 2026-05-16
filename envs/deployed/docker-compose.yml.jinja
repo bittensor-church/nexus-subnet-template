@@ -56,7 +56,6 @@ services:
     env_file: ./.env
     depends_on:
       - cadvisor
-      - validator
       - pylon
       - prometheus-proxy
     volumes:
@@ -70,7 +69,7 @@ services:
       scrape_configs:
         - job_name: 'validator'
           static_configs:
-            - targets: ['cadvisor:8080', 'host.docker.internal:9100', 'validator:9080']
+            - targets: ['cadvisor:8080', 'host.docker.internal:9100']
               labels:
                 hotkey: '{hotkey}'
                 bittensor_network: $${BITTENSOR_NETWORK:-finney}

@@ -7,7 +7,6 @@ dependencies = [
     "attrs>=26.1.0",
     "bittensor-nexus-library",
     "click>=8.3.2",
-    "prometheus-client>=0.25.0",
     "pydantic-settings>=2.14.0",
     "python-dotenv>=1.2.2",
 ]
