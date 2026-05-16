@@ -26,7 +26,7 @@
 # Implementing Validator
 
 **requires:** subnet design approved by user
-**grounding knowledge:** subnet design, nexus
+**grounding knowledge:** subnet design, nexus, observability
 **do not load:** localnet
 **definition of done:**
 
