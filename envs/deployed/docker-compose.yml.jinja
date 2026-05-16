@@ -94,7 +94,7 @@ services:
     environment:
       CENTRAL_PROMETHEUS_PROXY_URL: "https://prometheus.bactensor.io"
       ENV: "prometheus-proxy-prod"
-      SECRET_KEY: "${SECRET_KEY:?}"
+      SECRET_KEY: "${PROMETHEUS_PROXY_SECRET_KEY:?}"
       BITTENSOR_WALLET_NAME: "${BITTENSOR_WALLET_NAME:?}"
       BITTENSOR_WALLET_HOTKEY_NAME: "${BITTENSOR_WALLET_HOTKEY_NAME:?}"
       SENTRY_DSN: "${SENTRY_DSN:-}"

@@ -43,6 +43,7 @@ On first run the installer asks for:
 - `HOST_WALLET_DIR` (default `~/.bittensor/wallets`)
 - `BITTENSOR_WALLET_NAME` (default `validator`)
 - `BITTENSOR_WALLET_HOTKEY_NAME` (default `default`)
+- `SENTRY_DSN` (optional, press Enter to skip)
 
 ### Environment Variables
 
@@ -54,6 +55,9 @@ Written to `<WORKING_DIRECTORY>/.env` on first run:
 - `HOST_WALLET_DIR` — host-side path to the Bittensor wallets directory (mounted read-only into pylon).
 - `ENVIRONMENT` — deploy environment suffix used in the validator image name (default: `prod`).
 - `VALIDATOR_PYLON_OPEN_ACCESS_TOKEN` — auto-generated 32-byte hex token shared between validator and pylon.
+- `PYLON_METRICS_TOKEN` — auto-generated 32-byte hex Bearer token used by the local Prometheus to scrape Pylon's `/metrics` endpoint.
+- `PROMETHEUS_PROXY_SECRET_KEY` — auto-generated 32-byte hex signing key for the `bittensor-prometheus-proxy` sidecar that remote-writes metrics to `https://prometheus.bactensor.io`.
+- `SENTRY_DSN` — optional Sentry DSN for the `prometheus-proxy` sidecar; leave empty to disable error reporting.
 
 ## Custom Installation
 
