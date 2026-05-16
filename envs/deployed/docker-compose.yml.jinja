@@ -70,7 +70,7 @@ services:
       scrape_configs:
         - job_name: 'validator'
           static_configs:
-            - targets: ['cadvisor:8080', 'host.docker.internal:9100', 'validator:9080', 'prometheus-proxy:8000']
+            - targets: ['cadvisor:8080', 'host.docker.internal:9100', 'validator:9080']
               labels:
                 hotkey: '{hotkey}'
                 bittensor_network: $${BITTENSOR_NETWORK:-finney}
@@ -98,7 +98,5 @@ services:
       BITTENSOR_WALLET_NAME: "${BITTENSOR_WALLET_NAME:?}"
       BITTENSOR_WALLET_HOTKEY_NAME: "${BITTENSOR_WALLET_HOTKEY_NAME:?}"
       SENTRY_DSN: "${SENTRY_DSN:-}"
-      PROMETHEUS_MULTIPROC_DIR: "/prometheus-multiproc-dir/prometheus-proxy"
     volumes:
       - "${HOST_WALLET_DIR:?}:/root/.bittensor/wallets"
-      - "./prometheus-proxy-metrics:/prometheus-multiproc-dir"
