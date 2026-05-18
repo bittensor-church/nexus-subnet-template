@@ -87,9 +87,9 @@ The demo subnet is cat inpainting: miners receive an image and return the same i
 
 The repo contains the direct Chi prototype, the Nexus implementation, prompts, session dumps, localnet artifacts, and the side-by-side Chi/Nexus README.
 
-- Chi is valuable at the design and exploration stage. It gets the subnet idea into Bittensor terms and helps clarify the mechanism.
-- Chi can also produce a working prototype, but that is no longer the step to optimize for once Nexus exists. Prototype-quality code tends to leave production concerns such as runtime coordination, chain access, miner communication, scoring queues, state, weight setting, and local verification inside subnet-specific code.
-- Nexus is where the project should go once the design is ready to build: the same mechanism expressed through reusable actors and tasks for request entry, miner dispatch, scoring, weighing, error handling, and localnet-backed verification.
+- Chi is valuable at the design and exploration stage. It gets the subnet idea into Bittensor terms and helps clarify the mechanisms.
+- Chi can also produce a working prototype. However, prototype-quality code tends to leave production concerns such as thread-safety, code readability, understandability, and long-term maintainability to the subnet team.
+- Nexus is where that design should go once it is ready to build: the same mechanism expressed through reusable actors and tasks for request entry, miner dispatch, scoring, weighing, error handling, and localnet-backed verification.
 
 This comparison is useful because it does not claim Nexus invents better subnet ideas or replaces Chi. The idea and mechanism direction come first. Nexus shows the benefit of handing a Chi-designed subnet over to a production framework once the team needs software that is easier to test, operate, and extend.
 
