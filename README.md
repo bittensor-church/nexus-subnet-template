@@ -46,13 +46,13 @@ Nexus turns those concerns into shared framework capabilities instead of bespoke
 
 ### For Bittensor Ecosystem
 
-- shorter path from subnet idea to production subnet
+- shorter path from subnet ideas to production subnets
 - fewer strong ideas dying in implementation before they can prove their value
 - less ecosystem energy lost to repeated technical fights: miner DDoS, unreliable weight setting, validator deployment problems, and opaque vtrust failures
-- better test harnesses for incentive mechanisms, leading to safer and cheaper subnet changes
-- shared engineering investment that makes the underlying tech work for subnet teams instead of every team fighting it alone
-- more software teams able to build responsibly on Bittensor
 - more room for participant ingenuity to go into ground-breaking inventions, useful services, and real value creation
+- more software teams able to build responsibly on Bittensor
+- shared engineering investment that makes the underlying tech work for subnet teams instead of every team fighting it alone
+- better test harnesses for incentive mechanisms, leading to better digital commodities
 
 ### For Subnet Owners
 
@@ -61,6 +61,7 @@ Nexus turns those concerns into shared framework capabilities instead of bespoke
 - reusable building blocks able to express most subnet shapes
 - maintainable subnet code built from small components with clear interfaces and responsibilities
 - structure that is easier for both developers and coding agents to understand, extend, and verify
+- safer and cheaper subnet changes after launch
 - lower cost for the next subnet once the team understands the Nexus structure and building blocks
 
 ### For Validators
