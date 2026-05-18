@@ -19,6 +19,7 @@ Usage: uv run localnet/miners/miner-<profile>.py [-n NUM_INSTANCES]
 
 from __future__ import annotations
 
+import asyncio
 import multiprocessing
 import random
 import socket
@@ -33,7 +34,8 @@ import httpx
 import uvicorn
 from bittensor.utils.balance import Balance
 from bittensor_wallet import Keypair, Wallet
-from litestar import Litestar, post
+from litestar import Litestar, Response, post
+from litestar.background_tasks import BackgroundTask
 from pydantic import BaseModel
 
 MINER_NAME = "honest"
@@ -70,7 +72,7 @@ class ResponseEnvelope(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-def handle_request(input_data: dict[str, Any]) -> dict[str, Any]:
+def run_task(input_data: dict[str, Any]) -> dict[str, Any]:
     """Transform validator input into miner output.
 
     Override this with your subnet's logic:
@@ -80,32 +82,50 @@ def handle_request(input_data: dict[str, Any]) -> dict[str, Any]:
 
     The input_data dict contains the serialized InputModel from the validator.
     Return a dict matching the validator's expected OutputModel.
+
+    Runs in a worker thread after the validator has already been ACKed, so
+    blocking I/O is fine — but it must finish within the validator's
+    total_processing_timeout, or the callback arrives too late to count.
     """
     return input_data
 
 
 # ---------------------------------------------------------------------------
 # HTTP endpoint
+#
+# The Nexus AsyncHttpNeuronCommunicator expects a fast 2xx ACK on this path
+# (within send_timeout, ~1s) and then the actual result POSTed back to
+# data.callback_url. So: ACK immediately, then run the task in the
+# background and POST the response envelope from there.
 # ---------------------------------------------------------------------------
 
 
-@post(TARGET_PATH)
-async def handle_task(data: RequestEnvelope) -> None:
-    """Receive a task from the validator, process it, POST result back."""
-    print(f"[miner] Received request {data.request_id}")
+async def _post_response(callback_url: str, response: ResponseEnvelope) -> None:
+    async with httpx.AsyncClient() as client:
+        try:
+            await client.post(callback_url, json=response.model_dump())
+            print(f"[miner] Responded to {response.request_id}")
+        except Exception as exc:
+            print(f"[miner] Failed to callback for {response.request_id}: {exc}")
 
+
+async def _process_in_background(data: RequestEnvelope) -> None:
     try:
-        output = handle_request(data.input)
+        output = await asyncio.to_thread(run_task, data.input)
         response = ResponseEnvelope(request_id=data.request_id, output=output)
     except Exception as exc:
         response = ResponseEnvelope(request_id=data.request_id, error=str(exc))
+    await _post_response(data.callback_url, response)
 
-    async with httpx.AsyncClient() as client:
-        try:
-            await client.post(str(data.callback_url), json=response.model_dump())
-            print(f"[miner] Responded to {data.request_id}")
-        except Exception as exc:
-            print(f"[miner] Failed to callback for {data.request_id}: {exc}")
+
+@post(TARGET_PATH, status_code=202)
+async def ack_task(data: RequestEnvelope) -> Response[None]:
+    print(f"[miner] Received request {data.request_id}")
+    return Response(
+        content=None,
+        status_code=202,
+        background=BackgroundTask(_process_in_background, data),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -205,7 +225,7 @@ def setup_and_serve(instance_name: str) -> None:
     )
 
     print(f"[{instance_name}] Serving on 0.0.0.0:{port}{TARGET_PATH}")
-    app = Litestar(route_handlers=[handle_task])
+    app = Litestar(route_handlers=[ack_task])
     uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
 
 
