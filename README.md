@@ -32,17 +32,15 @@ Nexus is for **software developers**. It can deliver a lot, but it is not a no-c
 
 Bittensor subnet teams should not have to rediscover the same production pitfalls every time:
 
-- chain synchronization and subtensor communication
-- miner communication and request routing
-- async execution, background work, callbacks, and deadlock-prone coordination
-- weight setting, commit-reveal, and on-chain verification
+- weight setting and commit-reveal with on-chain verification
 - localnet setup and reproducible testing
+- miner communication, request routing, and protection against abusive traffic
+- chain synchronization and subtensor communication
+- async execution, background work, callbacks, and deadlock-prone coordination
 - scoring pipelines, persistence, observability, restart recovery, and safe upgrades
-- future shared machinery for secure communication, monetization, deployment, observability, and upgrades
+- future: even more secure communication, monetization, deployment, observability, and upgrades; see the [Chi, Nexus, and next steps comparison](./docs/index.html) for the fuller roadmap
 
 Nexus turns those concerns into shared framework capabilities instead of bespoke code inside every subnet.
-
-For a fuller capability matrix, see the [Chi, Nexus, and next steps comparison](./docs/index.html).
 
 ## What Is In It For Me?
 
