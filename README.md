@@ -83,7 +83,7 @@ For a fuller capability matrix, see the [Chi, Nexus, and next steps comparison](
 
 ## Catnet Demo
 
-The [Catnet comparison repo](https://github.com/bittensor-church/nexus-chi-comp) takes one Chi-shaped subnet idea and shows why the handoff matters: a cat-inpainting subnet where miners receive an image and return the same image with one realistic cat added.
+The [Catnet comparison repo](https://github.com/bittensor-church/nexus-chi-comp) takes one Chi-shaped subnet idea and shows why the handoff matters: a cat-inpainting subnet where miners receive an image and return the same image with one realistic cat added. It contains the direct Chi prototype, the Nexus implementation, prompts, session dumps, localnet artifacts, and the side-by-side Chi/Nexus README.
 
 - Chi is valuable at the design and exploration stage. It gets the subnet idea into Bittensor terms and helps clarify the mechanism.
 - Chi can also produce a working prototype, but that is no longer the step to optimize for once Nexus exists. Prototype-quality code tends to leave production concerns such as runtime coordination, chain access, miner communication, scoring queues, state, weight setting, and local verification inside subnet-specific code.
@@ -142,7 +142,7 @@ Priority areas:
 - safer weight-setting and commit-reveal verification
 - persistent but expiring weights and scoring history
 - synthetic traffic and miner result sampling as first-class framework patterns
-- Computehorde integration research and plugin planning
+- Computehorde plugin to offload compute-heavy validation to SN12
 - auto-update and deployment workflows
 - monetization primitives that can be added to subnets consistently, such as burning, allowances, and alpha payments
 - upgrade workflows that let existing Nexus-based subnets inherit framework improvements
