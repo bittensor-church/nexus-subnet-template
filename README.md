@@ -75,11 +75,10 @@ For a fuller capability matrix, see the [Chi, Nexus, and next steps comparison](
 
 ### For Miners
 
-- clearer miner contracts
-- more consistent communication protocols across Nexus-based subnets
-- better local fixtures for testing miner behavior
-- future shared support for auth, TLS, and request handling
-- a clearer path to miner-side development tools and reusable miner communication patterns
+- stronger default protection against miner DDoS and abusive validator traffic
+- secure validator-miner communication built into Nexus-based subnet machinery
+- clearer miner contracts and more consistent communication protocols across Nexus-based subnets
+- more robust validator code, making miner contributions easier to evaluate fairly and thoroughly
 
 ## Catnet Demo
 
