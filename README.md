@@ -81,7 +81,11 @@ Nexus turns those concerns into shared framework capabilities instead of bespoke
 
 ## Catnet Demo
 
-The [Catnet comparison repo](https://github.com/bittensor-church/nexus-chi-comp) takes one Chi-shaped subnet idea and shows why the handoff matters: a cat-inpainting subnet where miners receive an image and return the same image with one realistic cat added. It contains the direct Chi prototype, the Nexus implementation, prompts, session dumps, localnet artifacts, and the side-by-side Chi/Nexus README.
+The [Catnet comparison repo](https://github.com/bittensor-church/nexus-chi-comp) takes one Chi-shaped subnet idea and compares two outcomes: direct Chi used for both design and implementation, and Chi used for design with Nexus as the alternate implementation path.
+
+The demo subnet is cat inpainting: miners receive an image and return the same image with one realistic cat added.
+
+The repo contains the direct Chi prototype, the Nexus implementation, prompts, session dumps, localnet artifacts, and the side-by-side Chi/Nexus README.
 
 - Chi is valuable at the design and exploration stage. It gets the subnet idea into Bittensor terms and helps clarify the mechanism.
 - Chi can also produce a working prototype, but that is no longer the step to optimize for once Nexus exists. Prototype-quality code tends to leave production concerns such as runtime coordination, chain access, miner communication, scoring queues, state, weight setting, and local verification inside subnet-specific code.
