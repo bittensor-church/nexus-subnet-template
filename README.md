@@ -91,7 +91,7 @@ The repo contains the direct Chi prototype, the Nexus implementation, prompts, s
 - Chi can also produce a working prototype. However, prototype-quality code tends to leave production concerns such as thread-safety, code readability, understandability, and long-term maintainability to the subnet team.
 - Nexus is where that design should go once it is ready to build: the same mechanism expressed through reusable actors and tasks for request entry, miner dispatch, scoring, weighing, error handling, and localnet-backed verification.
 
-This comparison is useful because it does not claim Nexus invents better subnet ideas or replaces Chi. The idea and mechanism direction come first. Nexus shows the benefit of handing a Chi-designed subnet over to a production framework once the team needs software that is easier to test, operate, and extend.
+This comparison is useful because it shows what changes at the code-producing stage. The idea and design direction come first; Nexus offers a stronger path once the team needs software that is easier to test, operate, and extend.
 
 The Catnet comparison also exposed the practical difference in development experience:
 
