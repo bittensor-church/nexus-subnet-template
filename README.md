@@ -4,11 +4,11 @@
 
 **Subnets should be one-shotted, not hand-built.**
 
-[Const's Chi](https://github.com/unconst/Chi) turns a subnet idea into **Bittensor-native mechanism design**. Nexus turns that design into **production-grade validator software**: reusable infrastructure, local verification, and guardrails for teams that want to ship real subnets.
+[Const's Chi](https://github.com/unconst/Chi) turns a subnet idea into **Bittensor-native mechanism design**. Nexus turns that design into **production-grade validator software**: reusable subnet machinery, local verification, and guardrails for teams that want to ship real subnets.
 
-Together, Chi and Nexus create a **path from prompt to production**: design the subnet, build the validator, test it locally, and keep evolving it without rebuilding the same infrastructure every time.
+Together, Chi and Nexus create a **path from prompt to production**: design the subnet, build the validator, test it locally, and keep evolving it without rebuilding the same plumbing every time.
 
-The larger promise is leverage: solve common subnet machinery once, turn it into shared best practice, then let every Nexus-based subnet inherit it instead of reimplementing it alone.
+The larger promise is leverage: **solve common subnet plumbing once**, turn it into shared best practice, then let every Nexus-based subnet inherit it instead of reimplementing it alone.
 
 Nexus is for **software developers**. It can deliver a lot, but it is not a no-code promise: developers still need to understand the framework, review generated code, and own the software they ship.
 
@@ -21,14 +21,14 @@ Nexus is for **software developers**. It can deliver a lot, but it is not a no-c
 
 ## Read On
 
-- [What Nexus delivers](#what-nexus-delivers) - recurring subnet machinery moved into shared framework code.
-- [What is in it for me?](#what-is-in-it-for-me) - check what Nexus changes for subnet owners, validators, miners, and Bittensor.
+- [What Nexus offers](#what-nexus-offers) - recurring subnet machinery moved into shared framework code.
+- [What is in it for me?](#what-is-in-it-for-me) - check what Nexus changes for Bittensor, subnet owners, validators, and miners.
 - [Catnet demo](#catnet-demo) - the same cat demo subnet as direct Chi prototype and as Chi design implemented with Nexus.
 - [Why this matters](#why-this-matters) - why "something runs" is not enough for a real subnet.
 - [Current state](#current-state) - the current template, localnet, and Catnet artifacts.
 - [Funding ask](#funding-ask) - the next production-grade capabilities.
 
-## What Nexus Delivers
+## What Nexus Offers
 
 Bittensor subnet teams should not have to rediscover the same production pitfalls every time:
 
