@@ -46,6 +46,16 @@ For a fuller capability matrix, see the [Chi, Nexus, and next steps comparison](
 
 ## What Is In It For Me?
 
+### For Bittensor Ecosystem
+
+- shorter path from subnet idea to production subnet
+- fewer strong ideas dying in implementation before they can prove their value
+- less ecosystem energy lost to repeated technical fights: miner DDoS, unreliable weight setting, validator deployment problems, and opaque vtrust failures
+- better test harnesses for incentive mechanisms, leading to safer and cheaper subnet changes
+- shared engineering investment that makes the underlying tech work for subnet teams instead of every team fighting it alone
+- more software teams able to build responsibly on Bittensor
+- more room for participant ingenuity to go into ground-breaking inventions, useful services, and real value creation
+
 ### For Subnet Owners
 
 - fastest path from idea to production through a working, locally testable prototype
@@ -57,12 +67,11 @@ For a fuller capability matrix, see the [Chi, Nexus, and next steps comparison](
 
 ### For Validators
 
-- framework-owned chain communication through Pylon
-- structured weight-setting flow
-- fewer hidden background task failures
-- local proof artifacts before testnet/mainnet deployment
-- future support for persistence, observability, and safer upgrades
-- fewer direct concurrency and lifecycle hazards in validator code
+- safer, more reliable validator software with fewer lost dividends from failed weight setting, deadlocks, or silently failed background tasks
+- easier and cheaper validation of Nexus-based subnets, letting validator teams safely cover more subnets
+- structured chain communication through Pylon, making local subtensors and production chain access easier to manage
+- observability and autoupdate tooling for faster issue detection, validator-subnet-owner communication, and resolution
+- persistence for scores, task results, and validator state, enabling restarts and upgrades without avoidable vtrust loss
 
 ### For Miners
 
@@ -71,14 +80,6 @@ For a fuller capability matrix, see the [Chi, Nexus, and next steps comparison](
 - better local fixtures for testing miner behavior
 - future shared support for auth, TLS, and request handling
 - a clearer path to miner-side development tools and reusable miner communication patterns
-
-### For Bittensor
-
-- fewer isolated maintenance islands
-- reusable engineering investment across subnets
-- safer subnet launches
-- better test harnesses for incentive mechanisms
-- more software teams able to build responsibly on Bittensor
 
 ## Catnet Demo
 
