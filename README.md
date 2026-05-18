@@ -48,12 +48,12 @@ For a fuller capability matrix, see the [Chi, Nexus, and next steps comparison](
 
 ### For Subnet Owners
 
-- faster path from idea to working localnet
-- less custom infrastructure to own
-- cleaner codebase for hiring and handoff
-- reusable patterns for common subnet shapes
-- clearer path from prototype to production
-- lower cost for repeated subnet development after the first Nexus-based implementation
+- fastest path from idea to production through a working, locally testable prototype
+- less custom subnet machinery to own
+- reusable building blocks able to express most subnet shapes
+- maintainable subnet code built from small components with clear interfaces and responsibilities
+- structure that is easier for both developers and coding agents to understand, extend, and verify
+- lower cost for the next subnet once the team understands the Nexus structure and building blocks
 
 ### For Validators
 
