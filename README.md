@@ -2,7 +2,7 @@
 
 > A proudly Bittensor-gnostic framework for building production-ready subnets.
 
-**Subnets should be one-shotted, not hand-built.**
+**Subnets should be built with agents, not hand-built from scratch.**
 
 [Const's Chi](https://github.com/unconst/Chi) turns a subnet idea into **Bittensor-native mechanism design**. Nexus turns that design into **production-grade validator software**: reusable subnet machinery, local verification, and guardrails for teams that want to ship real subnets.
 
@@ -10,7 +10,7 @@ Together, Chi and Nexus create a **path from prompt to production**: design the 
 
 The larger promise is leverage: **solve common subnet plumbing once**, turn it into shared best practice, then let every Nexus-based subnet inherit it instead of reimplementing it alone.
 
-Nexus is for **software developers**. It can deliver a lot, but it is not a no-code promise: developers still need to understand the framework, review generated code, and own the software they ship.
+Nexus is for **software developers**. You can get far with agents, but production still deserves engineering ownership: review what gets generated, understand the system you operate, and own the software you ship.
 
 ## Usage
 
