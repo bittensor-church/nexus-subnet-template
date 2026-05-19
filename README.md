@@ -14,10 +14,14 @@ Nexus is for **software developers**. You can get far with agents, but productio
 
 ## Usage
 
+This repository includes the Bittensor knowledge base from [Const's Chi](https://github.com/unconst/Chi), lightly patched to fit the Nexus workflow.
+
+The intended flow:
+
 1. Clone this repo into your AI coding agent of choice.
-2. Ask: "How do I make [your subnet idea]?"
-3. Use Chi deeply for mechanism design.
-4. Let Nexus take over once the design is ready to implement and verify locally.
+2. Start with design. Ask the agent how to turn your subnet idea into a Bittensor mechanism, pointing it to the Chi knowledge base in this repo.
+3. Iterate until the subnet design is clear enough to implement.
+4. Move to implementation. Ask the agent to use the rest of the Nexus repo to build the validator, localnet setup, tests, and verification artifacts.
 
 ## Read On
 
