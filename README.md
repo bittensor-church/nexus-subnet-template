@@ -30,7 +30,7 @@ The intended flow:
 - [Catnet demo](#catnet-demo) - the same cat demo subnet as direct Chi prototype and as Chi design implemented with Nexus.
 - [Why this matters](#why-this-matters) - why "something runs" is not enough for a real subnet.
 - [Current state](#current-state) - the current template, localnet, and Catnet artifacts.
-- [Funding ask](#funding-ask) - the next production-grade capabilities.
+- [What comes next](#what-comes-next) - the next production-grade capabilities.
 
 ## What Nexus Offers
 
@@ -132,7 +132,7 @@ Nexus is an early preview. It already demonstrates the direction:
 
 The current work proves the thesis, but it is not the end state.
 
-## Funding Ask
+## What Comes Next
 
 The next phase is to turn Nexus from a promising preview into a production-grade subnet development platform.
 
