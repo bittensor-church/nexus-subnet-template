@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [tool.uv]
-exclude-newer = "1 week"
+exclude-newer = "11 days"
 
 [tool.uv.sources]
 bittensor-nexus-library = { git = "https://github.com/bittensor-church/bittensor-nexus-library.git" }
