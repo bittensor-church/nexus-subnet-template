@@ -12,6 +12,8 @@ dependencies = [
 ]
 
 [tool.uv]
+# This exclusion is a crucial security measure and MUST NOT be relaxed.
+# This is intended to help avoid pulling in freshly published compromised dependencies.
 exclude-newer = "11 days"
 
 [tool.uv.sources]
