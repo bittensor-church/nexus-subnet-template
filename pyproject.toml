@@ -5,7 +5,7 @@ description = ""
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "attrs>=26.1.0",
+    "attrs>=26.1.0", # previously this was required for Nexus (litestar needed it) #TODO: See if this is still the case
     "bittensor-nexus-library",
     "click>=8.3.2",
     "python-dotenv>=1.2.2",
@@ -24,7 +24,6 @@ dev = [
     "basedpyright>=1.36.1",
     "ruff",
     "pytest",
-    "polyfactory",
 ]
 
 [tool.ruff]
