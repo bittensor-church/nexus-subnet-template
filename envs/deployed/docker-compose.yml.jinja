@@ -14,6 +14,7 @@ services:
       PYLON_ID_VALIDATOR_HOTKEY_NAME: "${BITTENSOR_WALLET_HOTKEY_NAME:?}"
       PYLON_ID_VALIDATOR_NETUID: "${NETUID:?}"
       PYLON_ID_VALIDATOR_TOKEN: "${VALIDATOR_PYLON_OPEN_ACCESS_TOKEN:?}"
+      PYLON_METRICS_TOKEN: "${PYLON_METRICS_TOKEN:?}"
     volumes:
       - "${HOST_WALLET_DIR:?}:/wallets:ro"
 
@@ -26,3 +27,77 @@ services:
       VALIDATOR_PYLON_SERVICE_ADDRESS: "http://pylon:8000"
     depends_on:
       - pylon
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.40.0
+    restart: unless-stopped
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /cgroup:/cgroup:ro
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc|run|boot|var/.+)($$|/)'
+      - '--collector.tcpstat'
+
+  prometheus:
+    image: backenddevelopersltd/bittensor_prometheus:latest
+    restart: unless-stopped
+    env_file: ./.env
+    depends_on:
+      - cadvisor
+      - pylon
+      - prometheus-proxy
+    volumes:
+      - "${HOST_WALLET_DIR:?}:/wallets:ro"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    entrypoint: |
+      /bin/sh -c 'cat <<EOF > /etc/prometheus/prometheus.yml.template
+      global:
+        scrape_interval: 30s
+      scrape_configs:
+        - job_name: 'validator'
+          static_configs:
+            - targets: ['cadvisor:8080', 'host.docker.internal:9100']
+              labels:
+                hotkey: '{hotkey}'
+                bittensor_network: $${BITTENSOR_NETWORK:-finney}
+        - job_name: 'pylon'
+          static_configs:
+            - targets: ['pylon:8000']
+              labels:
+                hotkey: '{hotkey}'
+                bittensor_network: $${BITTENSOR_NETWORK:-finney}
+          authorization:
+            type: Bearer
+            credentials: $${PYLON_METRICS_TOKEN}
+      remote_write:
+        - url: "http://prometheus-proxy:8000/prometheus_outbound_proxy/"
+      EOF
+      exec /entrypoint.sh --log.level=debug --storage.tsdb.retention.size=1GB'
+
+  prometheus-proxy:
+    image: backenddevelopersltd/bittensor-prometheus-proxy:latest
+    restart: unless-stopped
+    environment:
+      CENTRAL_PROMETHEUS_PROXY_URL: "https://prometheus.bactensor.io"
+      ENV: "prometheus-proxy-prod"
+      SECRET_KEY: "${PROMETHEUS_PROXY_SECRET_KEY:?}"
+      BITTENSOR_WALLET_NAME: "${BITTENSOR_WALLET_NAME:?}"
+      BITTENSOR_WALLET_HOTKEY_NAME: "${BITTENSOR_WALLET_HOTKEY_NAME:?}"
+      SENTRY_DSN: "${SENTRY_DSN:-}"
+    volumes:
+      - "${HOST_WALLET_DIR:?}:/root/.bittensor/wallets"
