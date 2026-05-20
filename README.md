@@ -144,7 +144,7 @@ Priority areas:
 - restart recovery good enough for validators to survive process restarts without losing trust-critical history
 - observability, health checks, and proof artifacts
 - Sentry/Loki/Grafana-style logging and metrics where cost-effective
-- secure miner communication, including centralized Epistula/TLS integration
+- secure miner communication, including TLS integration and/or building on ecosystem work like [Epistula](https://epistula.sybil.com/why-epistula) and [btlightning](https://github.com/inference-labs-inc/btlightning)
 - safer weight-setting and commit-reveal verification
 - persistent but expiring weights and scoring history
 - synthetic traffic and miner result sampling as first-class framework patterns
@@ -152,3 +152,5 @@ Priority areas:
 - auto-update and deployment workflows
 - monetization primitives that can be added to subnets consistently, such as burning, allowances, and alpha payments
 - upgrade workflows that let existing Nexus-based subnets inherit framework improvements
+
+**Every capability built into Nexus becomes available to every Nexus-based subnet.** Instead of each team reinventing the same operational machinery, improvements compound across the ecosystem. Bittensor already has great subnets with impressive tooling and engineering; Nexus can make that level of operational quality much more common, narrowing the gap between the best-run subnets and the average subnet.
