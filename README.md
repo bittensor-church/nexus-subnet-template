@@ -42,7 +42,7 @@ Bittensor subnet teams should not have to rediscover the same production pitfall
 - chain synchronization and subtensor communication
 - async execution, background work, callbacks, and deadlock-prone coordination
 - scoring pipelines, persistence, observability, restart recovery, and safe upgrades
-- future: even more secure communication, monetization, deployment, observability, and upgrades; see the [Chi, Nexus, and next steps comparison](./docs/index.html) for the fuller roadmap
+- future: even more secure communication, monetization, deployment, observability, and upgrades; see the [Chi, Nexus, and next steps comparison](https://bittensor-church.github.io/nexus-subnet-template/) for the fuller roadmap
 
 Nexus turns those concerns into shared framework capabilities instead of bespoke code inside every subnet.
 
