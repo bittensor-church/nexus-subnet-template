@@ -108,4 +108,4 @@ class ErrorLoggerActor(ConsumerActor[NexusException]):
 
     @override
     def _consume(self, ctx: Context, payload: NexusException) -> None:
-        logger.warning("Pipeline error from ctx=%s: %r", ctx.id, payload)
+        logger.exception("Pipeline error from ctx=%s: %r", ctx.id, payload, exc_info=payload)
