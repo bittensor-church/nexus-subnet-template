@@ -86,6 +86,12 @@
           background: #fff;
           color: var(--text);
         }
+        a {
+          color: var(--blue);
+          font-weight: 700;
+          text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
         .compare-wrap {
           background: var(--panel);
           border: 1px solid var(--line);
@@ -206,6 +212,21 @@
           color: var(--muted);
           margin-top: 2px;
         }
+        .wrap-up {
+          background: #ffffff;
+          border: 1px solid var(--line);
+          border-radius: 28px;
+          box-shadow: var(--shadow);
+          margin-top: 22px;
+          padding: 24px 28px;
+        }
+        .wrap-up p {
+          margin: 0;
+          color: var(--muted);
+          font-size: clamp(16px, 1.7vw, 19px);
+          max-width: 1100px;
+        }
+        .wrap-up strong { color: var(--text); }
         @media (max-width: 900px) {
           .page { padding: 18px 12px 32px; }
           .hero { padding: 20px 18px; border-radius: 22px; }
@@ -223,8 +244,17 @@
         <div class="eyebrow">Comparison</div>
         <h1>Chi, Nexus and the next steps</h1>
         <p class="lead">A proudly Bittensor-gnostic framework for building production-ready subnets</p>
-        <div class="headline">Subnets should be one-shotted, not hand-built.</div>
-        <p class="lead">Nexus turns a subnet concept into a production-grade system — even from a single LLM prompt.</p>
+        <div class="headline">Subnets should be created with agents, not hand-built from scratch.</div>
+        <p class="lead">
+            <a href="https://github.com/unconst/Chi">Const's Chi</a> helps shape the Bittensor-native design.
+            <a href="https://github.com/bittensor-church/nexus-subnet-template#readme">Nexus</a> gives agents and
+            developers the production framework to build, test, operate, and evolve it. The
+            <a href="https://github.com/bittensor-church/nexus-chi-comp">Catnet comparison</a> shows the difference on
+            one concrete subnet.
+        </p>
+        <p class="lead">
+            <strong>Solve common subnet plumbing once</strong>, then let every Nexus-based subnet inherit it.
+        </p>
         <div class="legend">
             <span class="pill"><strong>Chi</strong>: ✅ implemented · ⛔ not supported</span>
             <span class="pill"><strong>Nexus</strong>: ✅ implemented · 🚧 in progress · ⛔ not supported</span>
@@ -244,7 +274,9 @@
                                 <div class="plan-name">Chi</div>
                                 <span class="badge badge-current">Original</span>
                             </div>
-                            <div class="plan-sub">Existing design guidance and baseline implementation.</div>
+                            <div class="plan-sub">Bittensor-native design guidance; can also produce a direct
+                                prototype.
+                            </div>
                         </div>
                     </th>
                     <th>
@@ -253,8 +285,8 @@
                                 <div class="plan-name">Nexus <small>v0</small></div>
                                 <span class="badge badge-current">Current</span>
                             </div>
-                            <div class="plan-sub">Today’s extension with implemented and in-progress production
-                                features.
+                            <div class="plan-sub">Current template and framework path for Chi-designed subnet
+                                implementation.
                             </div>
                         </div>
                     </th>
@@ -264,8 +296,8 @@
                                 <div class="plan-name">Nexus</div>
                                 <span class="badge badge-best">Next steps</span>
                             </div>
-                            <div class="plan-sub">Core, supporting, and experimental capabilities to prioritize
-                                together.
+                            <div class="plan-sub">Production-grade capabilities that become available to every
+                                Nexus-based subnet.
                             </div>
                         </div>
                     </th>
@@ -328,7 +360,7 @@
                     <td class="mark">🟢</td>
                 </tr>
                 <tr>
-                    <th class="cap">Commit–Reveal</th>
+                    <th class="cap">Weight setting and commit-reveal with on-chain verification</th>
                     <td class="mark">✅</td>
                     <td class="mark">✅</td>
                     <td class="mark">✅</td>
@@ -340,12 +372,17 @@
                     <td class="mark">✅</td>
                 </tr>
                 <tr>
-                    <th class="cap">mTLS Miner–Validator Authentication and communication encryption</th>
+                    <th class="cap">Secure miner communication</th>
                     <td class="mark small">⛔
                         <div class="note">epistula signing present though</div>
                     </td>
                     <td class="mark">⛔</td>
-                    <td class="mark">🟡</td>
+                    <td class="mark small">🟡
+                        <div class="note">TLS integration and/or ecosystem work like
+                            <a href="https://epistula.sybil.com/why-epistula">Epistula</a> and
+                            <a href="https://github.com/inference-labs-inc/btlightning">btlightning</a>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <th class="cap">DDoS Shield for Miners</th>
@@ -385,7 +422,7 @@
                 </tr>
 
                 <tr class="cat-row">
-                    <th class="cap">⚙️ Reliability &amp; Infrastructure Performance</th>
+                    <th class="cap">⚙️ Runtime Reliability &amp; Operations</th>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -428,7 +465,9 @@
                     <th class="cap">Compute Scalability</th>
                     <td class="mark">⛔</td>
                     <td class="mark">⛔</td>
-                    <td class="mark">🔹</td>
+                    <td class="mark small">🔹
+                        <div class="note">Computehorde plugin to offload compute-heavy validation to SN12</div>
+                    </td>
                 </tr>
                 <tr>
                     <th class="cap">Failure isolation / locality</th>
@@ -462,7 +501,7 @@
                     <td class="mark">🟢</td>
                 </tr>
                 <tr>
-                    <th class="cap">Double Payment Monetization</th>
+                    <th class="cap">Monetization primitives: burning, allowances, alpha payments</th>
                     <td class="mark">⛔</td>
                     <td class="mark">⛔</td>
                     <td class="mark">🔹</td>
@@ -482,6 +521,12 @@
                 </tr>
                 <tr>
                     <th class="cap">Dynamic On-Chain Configuration</th>
+                    <td class="mark">⛔</td>
+                    <td class="mark">⛔</td>
+                    <td class="mark">🟢</td>
+                </tr>
+                <tr>
+                    <th class="cap">Upgrade workflows for framework improvements</th>
                     <td class="mark">⛔</td>
                     <td class="mark">⛔</td>
                     <td class="mark">🟢</td>
@@ -532,7 +577,9 @@
                         ⛔
                         <div class="note">only some local setup instructions</div>
                     </td>
-                    <td class="mark">🚧</td>
+                    <td class="mark small">✅
+                        <div class="note">current Catnet demo includes localnet artifacts and verification flow</div>
+                    </td>
                     <td class="mark">🟢</td>
                 </tr>
                 <tr>
@@ -562,12 +609,27 @@
                 <tr>
                     <th class="cap">Local &amp; Automated Testing</th>
                     <td class="mark">⛔</td>
+                    <td class="mark small">✅
+                        <div class="note">basic scoring and weight calculation tests in the demo path</div>
+                    </td>
+                    <td class="mark">🟢</td>
+                </tr>
+                <tr>
+                    <th class="cap">Synthetic traffic and miner result sampling</th>
+                    <td class="mark">⛔</td>
                     <td class="mark">⛔</td>
                     <td class="mark">🟢</td>
                 </tr>
                 </tbody>
             </table>
         </div>
+    </section>
+    <section class="wrap-up">
+        <p>
+            <strong>Every capability built into Nexus becomes available to every Nexus-based subnet.</strong>
+            Bittensor already has great subnets with impressive tooling and engineering; Nexus can make that level of
+            operational quality much more common, narrowing the gap between the best-run subnets and the average subnet.
+        </p>
     </section>
 </div>
 </body>
