@@ -23,7 +23,9 @@ Lightweight, isolated development environment modeling a toy subnet for rapid pr
 
 - **bootstrap.py** — creates owner and validator wallets, sets tempo, disables commit-reveal, registers subnet,
   registers, and stakes validator
-- **miners/miner.template.py** — not runnable; copy to miner-{profile}.py and customize per subnet's needs
+- **miners/miner.template.py** — not runnable; copy to miner-{profile}.py and customize per subnet's needs.
+  Distinct from the production miner in `/miner` (separate uv project) — these are localnet-only profile
+  simulators
 - **miners/miner-{profile}.py** — created miner fixtures go here; they self-register and serve, support -n for
   multi-instance
 - **wallets/** — stores all wallets for localnet; ~/.bittensor must never be used for localnet

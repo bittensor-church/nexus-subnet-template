@@ -25,6 +25,8 @@ services:
       PYLON_ID_VALIDATOR_HOTKEY_NAME: "default"
       PYLON_ID_VALIDATOR_NETUID: "${NETUID:?}"
       PYLON_ID_VALIDATOR_TOKEN: "${VALIDATOR_PYLON_IDENTITY_TOKEN:?}"
+      # Sync pylon's notion of block duration with subtensor-localnet fast-blocks (~250 ms).
+      PYLON_BLOCK_DURATION_SECONDS: "0.25"
     volumes:
       - ./wallets:/wallets:ro
     depends_on:

@@ -108,16 +108,26 @@ def fund_wallet(subtensor: bt.Subtensor, alice: Wallet, target: Wallet) -> None:
     print(f"  {target.name} funded")
 
 
-def create_and_activate_subnet(subtensor: bt.Subtensor, owner: Wallet) -> int:
-    """Create a new subnet and activate it. Returns the netuid."""
-    if subtensor.subnet_exists(netuid=EXPECTED_NETUID):
-        match = next((s for s in subtensor.all_subnets() if s.netuid == EXPECTED_NETUID), None)
-        if match and match.owner_coldkey == owner.coldkey.ss58_address:
+def get_subnet_owner_coldkey(subtensor: bt.Subtensor, netuid: int) -> str | None:
+    """Return owner coldkey of an existing subnet, or None if it doesn't exist.
+
+    Avoids `subtensor.all_subnets()`, which currently raises ZeroDivisionError on freshly
+    created subnets when alpha_in is 0 (bittensor 10.3.1 bug).
+    """
+    if not subtensor.subnet_exists(netuid=netuid):
+        return None
+    return subtensor.subnet(netuid=netuid).owner_coldkey
+
+
+def create_subnet(subtensor: bt.Subtensor, owner: Wallet) -> int:
+    """Create a subnet at EXPECTED_NETUID if missing. Returns the netuid. Idempotent."""
+    existing_owner = get_subnet_owner_coldkey(subtensor, EXPECTED_NETUID)
+    if existing_owner is not None:
+        if existing_owner == owner.coldkey.ss58_address:
             print(f"Subnet {EXPECTED_NETUID} already exists and is owned by us")
             return EXPECTED_NETUID
-        actual_owner = match.owner_coldkey if match else "?"
         print(
-            f"Subnet {EXPECTED_NETUID} already exists but is owned by {actual_owner}, "
+            f"Subnet {EXPECTED_NETUID} already exists but is owned by {existing_owner}, "
             f"not our owner ({owner.coldkey.ss58_address}). "
             f"Reset localnet (`cd localnet && docker compose down -v && rm -rf wallets/*/`) "
             f"or update NETUID in localnet/.env."
@@ -135,20 +145,26 @@ def create_and_activate_subnet(subtensor: bt.Subtensor, owner: Wallet) -> int:
         print(f"Subnet registration failed: {response.message}")
         sys.exit(1)
 
-    subnets = subtensor.all_subnets()
-    owned = [s for s in subnets if s.owner_coldkey == owner.coldkey.ss58_address]
-    netuid = max(owned, key=lambda s: s.network_registered_at).netuid
     # The chain auto-assigns the next free netuid; there's no extrinsic to request one.
     # Bail on mismatch so pylon/validator/monitor aren't silently misconfigured.
-    if netuid != EXPECTED_NETUID:
+    new_owner = get_subnet_owner_coldkey(subtensor, EXPECTED_NETUID)
+    if new_owner != owner.coldkey.ss58_address:
         print(
-            f"Subnet was assigned netuid {netuid}, but localnet/.env says NETUID={EXPECTED_NETUID}. "
+            f"Subnet at netuid {EXPECTED_NETUID} is owned by {new_owner}, expected {owner.coldkey.ss58_address}. "
+            f"Chain may have assigned a different netuid. "
             f"Reset localnet (`cd localnet && docker compose down -v && rm -rf wallets/*/`) or update NETUID."
         )
         sys.exit(1)
-    print(f"Subnet created with netuid {netuid}")
+    print(f"Subnet created with netuid {EXPECTED_NETUID}")
+    return EXPECTED_NETUID
 
-    # Activate the subnet — must wait for start_call delay
+
+def activate_subnet(subtensor: bt.Subtensor, owner: Wallet, netuid: int) -> None:
+    """Activate a subnet via start_call. Idempotent: noop if already active."""
+    if subtensor.is_subnet_active(netuid=netuid):
+        print(f"Subnet {netuid} already active")
+        return
+
     current_block = subtensor.get_current_block()
     delay_blocks = subtensor.get_start_call_delay()
     target_block = current_block + delay_blocks + 1
@@ -167,7 +183,6 @@ def create_and_activate_subnet(subtensor: bt.Subtensor, owner: Wallet) -> int:
         print(f"Subnet activation failed: {response.message}")
         sys.exit(1)
     print(f"Subnet {netuid} activated")
-    return netuid
 
 
 def set_admin_freeze_window(subtensor: bt.Subtensor, sudo: Wallet, window: int) -> None:
@@ -278,13 +293,24 @@ def register_neuron(subtensor: bt.Subtensor, wallet: Wallet, netuid: int) -> Non
 
 
 def stake_validator(subtensor: bt.Subtensor, wallet: Wallet, netuid: int) -> None:
-    """Add stake to the validator."""
-    print(f"  Staking {VALIDATOR_STAKE_TAO} TAO for {wallet.name}...")
+    """Ensure the validator has the target localnet stake."""
+    current_stake = subtensor.get_stake(
+        coldkey_ss58=wallet.coldkey.ss58_address,
+        hotkey_ss58=wallet.hotkey.ss58_address,
+        netuid=netuid,
+    )
+    target_stake = Balance.from_tao(VALIDATOR_STAKE_TAO, netuid=netuid)
+    if current_stake >= target_stake:
+        print(f"  {wallet.name} already staked (stake: {current_stake})")
+        return
+
+    amount_to_add = Balance.from_tao(target_stake.tao - current_stake.tao)
+    print(f"  Staking {amount_to_add} for {wallet.name}...")
     response = subtensor.add_stake(
         wallet=wallet,
         netuid=netuid,
         hotkey_ss58=wallet.hotkey.ss58_address,
-        amount=Balance.from_tao(VALIDATOR_STAKE_TAO),
+        amount=amount_to_add,
         wait_for_inclusion=True,
         wait_for_finalization=True,
         mev_protection=False,
@@ -308,7 +334,7 @@ def main() -> None:
     fund_wallet(subtensor, alice, owner)
 
     print("\n--- Creating subnet ---")
-    netuid = create_and_activate_subnet(subtensor, owner)
+    netuid = create_subnet(subtensor, owner)
 
     print("\n--- Disabling admin freeze window ---")
     set_admin_freeze_window(subtensor, alice, ADMIN_FREEZE_WINDOW)
@@ -316,6 +342,9 @@ def main() -> None:
     print("\n--- Configuring subnet hyperparameters ---")
     set_subnet_tempo(subtensor, alice, netuid, SUBNET_TEMPO)
     set_commit_reveal_enabled(subtensor, owner, netuid, SUBNET_COMMIT_REVEAL_ENABLED)
+
+    print("\n--- Activating subnet ---")
+    activate_subnet(subtensor, owner, netuid)
 
     # Validator: registers and stakes
     print("\n--- Setting up validator ---")
@@ -328,7 +357,9 @@ def main() -> None:
     print(f"Subnet:    {netuid}")
     print(f"Owner:     {owner.coldkey.ss58_address}")
     print(f"Validator: {validator.hotkey.ss58_address}")
-    print("\nNext: start a miner with `uv run localnet/miners/<profile>.py`")
+    print(
+        "\nNext: start the miner (cd miner && uv run miner) or a localnet fixture (uv run localnet/miners/<profile>.py)"
+    )
 
 
 if __name__ == "__main__":
