@@ -1,0 +1,64 @@
+_subdirectory: .
+_templates_suffix: .jinja
+_envops:
+  trim_blocks: true
+  lstrip_blocks: true
+_min_copier_version: "9.0.0"
+
+_exclude:
+  - .git
+  - .venv
+  - "**/.venv"
+  - "**/__pycache__"
+  - "**/.pytest_cache"
+  - "**/.ruff_cache"
+  - copier.yml
+  - "/.claude"
+
+subnet_name:
+  type: str
+  help: "Human-readable subnet name."
+
+subnet_slug:
+  type: str
+  help: "Lowercase URL-safe slug used in default names."
+  default: "{{ subnet_name | lower | replace(' ', '-') | replace('_', '-') }}"
+
+github_org:
+  type: str
+  help: "GitHub org or user that will own the rendered repo."
+
+github_repo:
+  type: str
+  help: "GitHub repository name."
+  default: "{{ subnet_slug }}"
+
+image_registry:
+  type: str
+  help: "Container registry host for the validator image."
+  default: "ghcr.io"
+
+image_basename:
+  type: str
+  help: "Validator image name (without registry/org)."
+  default: "{{ subnet_slug }}-validator"
+
+default_netuid:
+  type: int
+  help: "Default Bittensor netuid baked into the operator's .env."
+  default: 1
+
+default_network:
+  type: str
+  help: "Default Bittensor network baked into the operator's .env."
+  default: "finney"
+
+working_dir_name:
+  type: str
+  help: "Default working directory name under the operator's $HOME."
+  default: "{{ subnet_slug }}-validator"
+
+cron_tag:
+  type: str
+  help: "Unique cron-line marker (must be unique per host across subnets)."
+  default: "{{ subnet_slug | upper | replace('-', '_') }}_VALIDATOR_UPDATE"

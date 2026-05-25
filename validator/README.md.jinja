@@ -1,0 +1,20 @@
+# {{ subnet_name }} Validator
+
+Validator node for the {{ subnet_name }} Bittensor subnet.
+
+## What this is
+
+A `docker compose` stack with two containers:
+
+- **pylon** — sidecar that proxies all Bittensor / subtensor communication for the
+  validator (handles wallet, weight setting, metagraph reads).
+- **validator** — the {{ subnet_name }} validator process built from this repo.
+
+## Running a validator
+
+See [`installer/README.md`](../installer/README.md) for installation, configuration,
+updates and prerequisites.
+
+## More
+
+- Repository root `README.md` — what {{ subnet_name }} is and how the subnet works.

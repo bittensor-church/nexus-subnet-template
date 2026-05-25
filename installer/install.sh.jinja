@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# Installer for the {{ subnet_name }} validator.
+# Sets up the working directory, .env, and a cron job that keeps docker-compose.yml in sync.
+
+set -euo pipefail
+
+ENV_NAME="${1:-prod}"
+WORKING_DIRECTORY=${2:-~/{{ working_dir_name }}/}
+
+mkdir -p "${WORKING_DIRECTORY}"
+WORKING_DIRECTORY=$(realpath "${WORKING_DIRECTORY}")
+
+ENV_FILE="${WORKING_DIRECTORY}/.env"
+if [ ! -f "${ENV_FILE}" ]; then
+    echo "Creating .env file..."
+
+    read -r -p "Enter BITTENSOR_NETWORK [{{ default_network }}]: " BITTENSOR_NETWORK </dev/tty
+    BITTENSOR_NETWORK=${BITTENSOR_NETWORK:-{{ default_network }}}
+
+    read -r -p "Enter HOST_WALLET_DIR [~/.bittensor/wallets]: " HOST_WALLET_DIR </dev/tty
+    HOST_WALLET_DIR=${HOST_WALLET_DIR:-~/.bittensor/wallets}
+
+    read -r -p "Enter BITTENSOR_WALLET_NAME [validator]: " BITTENSOR_WALLET_NAME </dev/tty
+    BITTENSOR_WALLET_NAME=${BITTENSOR_WALLET_NAME:-validator}
+
+    read -r -p "Enter BITTENSOR_WALLET_HOTKEY_NAME [default]: " BITTENSOR_WALLET_HOTKEY_NAME </dev/tty
+    BITTENSOR_WALLET_HOTKEY_NAME=${BITTENSOR_WALLET_HOTKEY_NAME:-default}
+
+    VALIDATOR_PYLON_OPEN_ACCESS_TOKEN=$(openssl rand -hex 32)
+    NETUID={{ default_netuid }}
+
+    cat > "${ENV_FILE}" << EOL
+NETUID=${NETUID}
+BITTENSOR_NETWORK=${BITTENSOR_NETWORK}
+BITTENSOR_WALLET_NAME=${BITTENSOR_WALLET_NAME}
+BITTENSOR_WALLET_HOTKEY_NAME=${BITTENSOR_WALLET_HOTKEY_NAME}
+HOST_WALLET_DIR=${HOST_WALLET_DIR}
+ENVIRONMENT=${ENV_NAME}
+VALIDATOR_PYLON_OPEN_ACCESS_TOKEN=${VALIDATOR_PYLON_OPEN_ACCESS_TOKEN}
+EOL
+
+    echo ".env file created successfully."
+fi
+
+if ! grep -q '^ENVIRONMENT=' "${ENV_FILE}"; then
+    echo "ENVIRONMENT=${ENV_NAME}" >> "${ENV_FILE}"
+fi
+
+GITHUB_URL="https://raw.githubusercontent.com/{{ github_org }}/{{ github_repo }}/refs/heads"
+UPDATE_SCRIPT="${WORKING_DIRECTORY}/update_compose.sh"
+UPDATE_URL="${GITHUB_URL}/deploy-config-${ENV_NAME}/installer/update_compose.sh"
+
+echo "Running update_compose.sh once to ensure it works..."
+curl -fsSL "${UPDATE_URL}" -o "${UPDATE_SCRIPT}"
+chmod +x "${UPDATE_SCRIPT}"
+if ! "${UPDATE_SCRIPT}" "${ENV_NAME}" "${WORKING_DIRECTORY}"; then
+    echo "Error: update_compose.sh failed. Not adding cronline."
+    exit 1
+fi
+echo "update_compose.sh ran successfully."
+
+printf -v UPDATE_URL_Q "%q" "${UPDATE_URL}"
+printf -v UPDATE_SCRIPT_Q "%q" "${UPDATE_SCRIPT}"
+printf -v ENV_NAME_Q "%q" "${ENV_NAME}"
+printf -v WORKING_DIRECTORY_Q "%q" "${WORKING_DIRECTORY}"
+
+CRON_CMD="*/15 * * * * curl -fsSL ${UPDATE_URL_Q} -o ${UPDATE_SCRIPT_Q} && chmod +x ${UPDATE_SCRIPT_Q} && ${UPDATE_SCRIPT_Q} ${ENV_NAME_Q} ${WORKING_DIRECTORY_Q} # {{ cron_tag }}"
+
+EXISTING_CRONTAB="$(crontab -l 2>/dev/null || true)"
+FILTERED_CRONTAB="$(printf "%s\n" "${EXISTING_CRONTAB}" | grep -F -v "{{ cron_tag }}" || true)"
+if [ -n "${FILTERED_CRONTAB}" ]; then
+    { printf "%s\n" "${FILTERED_CRONTAB}"; printf "%s\n" "${CRON_CMD}"; } | crontab -
+else
+    printf "%s\n" "${CRON_CMD}" | crontab -
+fi
+
+echo "Cron job installed successfully. It will run every 15 minutes."
+echo "Environment: ${ENV_NAME}"
+echo "Working directory: ${WORKING_DIRECTORY}"

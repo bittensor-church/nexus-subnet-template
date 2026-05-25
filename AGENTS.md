@@ -5,11 +5,40 @@ containing the necessary knowledge and structure to quickly bootstrap a new subn
 template and modify it as needed. Once you start developing it, update this notice to reflect what the actual
 project is about and keep its template origin as a short note.
 
+## Repository layout
+
+This is a monorepo with two **independent** uv projects plus shared local-development tooling:
+
+- `validator/` — Nexus-based subnet validator (own `pyproject.toml`, `uv.lock`, `.venv`); also holds the
+  production `Dockerfile`
+- `miner/` — Bittensor subnet miner (own `pyproject.toml`, `uv.lock`, `.venv`)
+- `localnet/` — Local subtensor + pylon + bootstrap + miner fixtures for end-to-end development
+- `installer/` — Copier-templated validator installer scripts (`install.sh.jinja`,
+  `update_compose.sh.jinja`, `README.md.jinja`); rendered by `copier copy` when adapting the template
+- `envs/deployed/` — Copier-templated production `docker-compose.yml.jinja` (validator + pylon);
+  the rendered repo is promoted on the `deploy-config-prod` branch, with this compose file and the
+  installer scripts as the operator-critical files
+- `.github/workflows/` — Copier-templated CI; `build-validator.yml.jinja` builds and pushes the validator
+  image to a registry on push to `deploy-build-*` branches
+- `copier.yml` — Copier question schema for adapting this template to a concrete subnet
+- `knowledge/` — Bittensor / Nexus / localnet domain knowledge
+- `docs/` — additional documentation
+
+There is **no** top-level Python project and **no** uv workspace. Run `uv sync` inside `validator/` or `miner/`
+before working on it. There is no global `uv run` from the repo root.
+
+Developer quickstart for the end-to-end dev environment (subtensor + pylon + validator + miner): see
+`localnet/README.md`.
+
+Ruff and basedpyright config is duplicated between `validator/pyproject.toml` and `miner/pyproject.toml`. When
+changing tooling config, keep both in sync.
+
 ## Adapting this repository to a new subnet
 
 This template has to be adapted to an actual project at some point. When starting out, refer to the
 knowledge/tasks.project-bootstrap.md file. It contains workflows for:
 
+- Bootstrapping the template
 - Designing the subnet
 - Implementing the validator
 - Setting up localnet
@@ -55,8 +84,8 @@ Nexus provides a large set of reusable components that handle common validator c
 code, making any decisions, or responding with recommendations — discover what Nexus offers. It will likely
 already handle most of the requirements of the subnet you are working on.
 
-The Nexus knowledge base ships with the Nexus package — find it in `.venv` within the installed Nexus package
-under `docs/`. Make sure Nexus is installed first (follow this project's package management guidelines). Read
+The Nexus knowledge base ships with the Nexus package — find it in `validator/.venv` within the installed
+Nexus package under `docs/`. Make sure Nexus is installed first by running `uv sync` in `validator/`. Read
 `docs/nexus.md` in the Nexus package — it is the grounding document for all validator implementation work.
 
 Whenever working on validator code, double-check compliance with Nexus's best practices, coding guidelines,
@@ -67,7 +96,7 @@ Skip reading Nexus KB for higher level tasks that do not touch the code.
 ### Pylon
 
 Sidecar subtensor communication proxy. Nexus uses Pylon for all subtensor (blockchain) communication. The pylon
-client's source code can be found and inspected in `.venv`.
+client's source code can be found and inspected in `validator/.venv`.
 
 Skip for higher level tasks that do not touch the code.
 
@@ -107,4 +136,4 @@ tested. Take great care to avoid drift between these files.
 
 ---
 
-Note: CLAUDE.md and .cursorrules both link to CLAUDE.md - they are all the same file. No need to re-read it. 
+Note: CLAUDE.md and .cursorrules both link to CLAUDE.md - they are all the same file. No need to re-read it.
