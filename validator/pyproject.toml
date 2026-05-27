@@ -9,6 +9,7 @@ dependencies = [
     "click>=8.3.2",
     "pydantic-settings>=2.14.0",
     "python-dotenv>=1.2.2",
+    "sentry-sdk>=2.60.0",
 ]
 
 [project.scripts]

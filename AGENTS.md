@@ -71,8 +71,9 @@ Contains, among others:
 - theory behind validation, mining, incentives, miner-validator contract
 - suggested external integrations and tools in the ecosystem
 
-Index: knowledge/bittensor/INDEX.yaml Recommended subnet design location: ./subnet_design.md (create when
-needed)
+Index: knowledge/bittensor/INDEX.yaml
+
+Recommended subnet design location: ./subnet_design.md (create when needed)
 
 ## Nexus
 
