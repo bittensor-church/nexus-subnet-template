@@ -1,250 +1,341 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chi, Nexus and the next steps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css">
     <style>
         :root {
-          --bg: #f8fafc;
-          --panel: #ffffff;
-          --line: #e2e8f0;
-          --text: #0f172a;
-          --muted: #475569;
-          --blue: #2563eb;
-          --blue-soft: #dbeafe;
-          --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            --bg: #F7F6F3;
+            --surface: #FFFFFF;
+            --text: #1C1917;
+            --text-2: #78716C;
+            --text-3: #A8A29E;
+            --border: #E7E5E4;
+            --accent: #4338CA;
+            --accent-soft: #EEF2FF;
+            --cat-bg: #EDECE8;
+            --highlight: rgba(67, 56, 202, 0.035);
+            --cell-bg: rgba(0, 0, 0, 0.035);
+            --badge-cur-bg: #ECFEFF;
+            --badge-cur-text: #155E75;
         }
-        * { box-sizing: border-box; }
-        html, body {
-          margin: 0;
-          padding: 0;
-          background: var(--bg);
-          color: var(--text);
-          font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0C0A09;
+                --surface: #1C1917;
+                --text: #F5F5F4;
+                --text-2: #A8A29E;
+                --text-3: #78716C;
+                --border: #292524;
+                --accent: #A5B4FC;
+                --accent-soft: rgba(99, 102, 241, 0.12);
+                --cat-bg: #171412;
+                --highlight: rgba(165, 180, 252, 0.05);
+                --cell-bg: rgba(255, 255, 255, 0.02);
+                --badge-cur-bg: rgba(21, 94, 117, 0.3);
+                --badge-cur-text: #67E8F9;
+            }
         }
-        body { line-height: 1.45; }
+        * { box-sizing: border-box; margin: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: var(--accent); text-decoration: none; font-weight: 700; }
+        a:hover { text-decoration: underline; }
+
+        /* ── Page ── */
         .page {
-          max-width: 1440px;
-          margin: 0 auto;
-          padding: 32px 20px 56px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 56px 32px 96px;
         }
-        .hero {
-          background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-          border: 1px solid var(--line);
-          border-radius: 28px;
-          box-shadow: var(--shadow);
-          padding: 28px 28px 24px;
-          margin-bottom: 22px;
-        }
-        .eyebrow {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 13px;
-          font-weight: 700;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          color: var(--blue);
-          background: var(--blue-soft);
-          border-radius: 999px;
-          padding: 7px 12px;
+
+        /* ── Hero ── */
+        .hero { margin-bottom: 56px; }
+        .tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: var(--accent-soft);
+            padding: 5px 12px;
+            border-radius: 6px;
+            margin-bottom: 24px;
         }
         h1 {
-          margin: 16px 0 10px;
-          font-size: clamp(32px, 5vw, 54px);
-          line-height: 1.02;
-          letter-spacing: -0.03em;
+            font-family: 'Fraunces', serif;
+            font-weight: 900;
+            font-size: clamp(40px, 6vw, 72px);
+            line-height: 0.95;
+            letter-spacing: -0.035em;
+            margin-bottom: 24px;
+        }
+        .subtitle {
+            font-size: clamp(15px, 1.6vw, 17px);
+            color: var(--text-2);
+            margin-bottom: 20px;
+        }
+        .callout {
+            font-size: clamp(18px, 2.4vw, 26px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            max-width: 640px;
         }
         .lead {
-          margin: 0;
-          font-size: clamp(17px, 2vw, 21px);
-          color: var(--muted);
-          max-width: 1100px;
+            font-size: clamp(15px, 1.6vw, 18px);
+            color: var(--text-2);
+            max-width: 760px;
         }
-        .headline {
-          margin: 18px 0 12px;
-          font-size: clamp(20px, 2.6vw, 28px);
-          font-weight: 800;
-          color: var(--text);
-        }
+        .lead + .lead { margin-top: 10px; }
+        .lead strong { color: var(--text); }
         .legend {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          margin: 20px 0 4px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 28px;
         }
-        .pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 8px 12px;
-          border-radius: 999px;
-          font-size: 13px;
-          font-weight: 700;
-          border: 1px solid var(--line);
-          background: #fff;
-          color: var(--text);
+        .legend span {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-2);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 5px 10px;
+            border-radius: 6px;
         }
-        a {
-          color: var(--blue);
-          font-weight: 700;
-          text-decoration: none;
+
+        /* ── Comparison ── */
+        .comparison { border-top: 2px solid var(--text); }
+
+        .col-headers {
+            display: grid;
+            grid-template-columns: 2.2fr 1fr 1fr 1fr;
+            position: sticky;
+            top: -1px;
+            z-index: 20;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
         }
-        a:hover { text-decoration: underline; }
-        .compare-wrap {
-          background: var(--panel);
-          border: 1px solid var(--line);
-          border-radius: 28px;
-          box-shadow: var(--shadow);
-          overflow: hidden;
+        .col-headers::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0; right: 0;
+            height: 10px;
+            background: linear-gradient(var(--bg), transparent);
+            pointer-events: none;
         }
-        .compare-scroll {
-          overflow: auto;
-          max-height: calc(100vh - 120px);
+        .corner { padding: 20px; }
+        .ch {
+            padding: 20px 16px;
+            text-align: center;
+            border-left: 1px solid var(--border);
         }
-        table {
-          width: 100%;
-          border-collapse: separate;
-          border-spacing: 0;
-          min-width: 1180px;
+        .ch:last-child { background: var(--highlight); }
+        .ch-name {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
         }
-        thead th {
-          position: sticky;
-          top: 0;
-          z-index: 5;
-          background: rgba(255,255,255,0.96);
-          backdrop-filter: blur(8px);
-          border-bottom: 1px solid var(--line);
-          padding: 0;
-          vertical-align: top;
-        }
-        th:first-child, td:first-child {
-          position: sticky;
-          left: 0;
-          z-index: 3;
-          background: inherit;
-        }
-        thead th:first-child { z-index: 6; }
-        .cap-head {
-          text-align: left;
-          padding: 24px 18px;
-          min-width: 420px;
-          font-size: 14px;
-          color: var(--muted);
-          background: rgba(255,255,255,0.96);
-        }
-        .plan-head {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: flex-start;
-          min-height: 128px;
-          padding: 16px;
-          border-left: 1px solid var(--line);
-          text-align: center;
-        }
-        .plan-head.primary {
-          background: linear-gradient(180deg, #f6faff 0%, #ffffff 100%);
-          box-shadow: inset 0 -3px 0 var(--blue);
-        }
-        .plan-title {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 6px;
-          margin: 0 0 6px;
-        }
-        .plan-name {
-          font-size: 24px;
-          font-weight: 800;
-          letter-spacing: -0.02em;
-        }
-        .plan-sub {
-          font-size: 13px;
-          color: var(--muted);
-          max-width: 240px;
-        }
+        .ch-name small { font-size: 14px; font-weight: 600; color: var(--text-2); }
         .badge {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          padding: 3px 8px;
-          border-radius: 999px;
-          font-size: 9px;
-          font-weight: 800;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          border: 1px solid transparent;
+            display: inline-block;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-top: 6px;
         }
-        .badge-current { background: #ecfeff; color: #155e75; border-color: #bae6fd; }
-        .badge-best { background: var(--blue); color: white; }
-        tbody td, tbody th {
-          padding: 14px 18px;
-          border-bottom: 1px solid var(--line);
-          background: #fff;
-          vertical-align: middle;
+        .badge-orig { background: var(--accent-soft); color: var(--accent); }
+        .badge-curr { background: var(--badge-cur-bg); color: var(--badge-cur-text); }
+        .badge-next { background: var(--accent); color: #fff; }
+        @media (prefers-color-scheme: dark) { .badge-next { color: #0C0A09; } }
+        .ch-desc { font-size: 12px; color: var(--text-2); margin-top: 8px; line-height: 1.35; }
+
+        /* Category bars */
+        .cat {
+            font-size: 14px;
+            font-weight: 800;
+            padding: 10px 20px;
+            background: var(--cat-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        tbody td + td, tbody th + td, thead th + th { border-left: 1px solid var(--line); }
-        .cat-row td, .cat-row th {
-          background: #f8fafc;
-          font-weight: 800;
-          color: var(--text);
-          border-top: 1px solid var(--line);
+        .cat i { font-size: 16px; }
+        .cat-framing i { color: #eab308; }
+        .cat-security i { color: #ef4444; }
+        .cat-infra i { color: #3b82f6; }
+        .cat-patterns i { color: #a855f7; }
+        .cat-oversight i { color: #14b8a6; }
+        .cat-devex i { color: #f97316; }
+
+        /* Status icons */
+        .s-done, .s-core { color: #16a34a; }
+        .s-no { color: var(--text-3); }
+        .s-wip, .s-support { color: #d97706; }
+        .s-exp { color: #6366f1; }
+        @media (prefers-color-scheme: dark) {
+            .s-done, .s-core { color: #4ade80; }
+            .s-wip, .s-support { color: #fbbf24; }
+            .s-exp { color: #a5b4fc; }
         }
-        .cap {
-          font-weight: 600;
-          text-align: left;
-          background: #fff;
+
+        /* Data rows — always a grid */
+        .row {
+            display: grid;
+            grid-template-columns: 2.2fr 1fr 1fr 1fr;
+            border-bottom: 1px solid var(--border);
         }
-        .mark {
-          text-align: center;
-          font-size: 18px;
-          line-height: 1.3;
-          min-width: 180px;
+        .cap { padding: 11px 20px; font-weight: 600; font-size: 14px; display: flex; align-items: center; }
+        .v {
+            padding: 11px 16px;
+            text-align: center;
+            font-size: 15px;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        .mark.small {
-          font-size: 15px;
-          line-height: 1.35;
+        .v .vi { display: contents; }
+        .v i { font-size: 34px; }
+        .v small {
+            display: block;
+            font-size: 11px;
+            color: var(--text-2);
+            margin-top: 2px;
+            line-height: 1.3;
         }
-        .note {
-          font-size: 13px;
-          color: var(--muted);
-          margin-top: 2px;
-        }
+        .v:last-child { background: var(--highlight); }
+
+        /* ── Wrap-up ── */
         .wrap-up {
-          background: #ffffff;
-          border: 1px solid var(--line);
-          border-radius: 28px;
-          box-shadow: var(--shadow);
-          margin-top: 22px;
-          padding: 24px 28px;
+            margin-top: 56px;
+            padding: 28px 0;
+            border-top: 2px solid var(--text);
         }
         .wrap-up p {
-          margin: 0;
-          color: var(--muted);
-          font-size: clamp(16px, 1.7vw, 19px);
-          max-width: 1100px;
+            font-size: clamp(15px, 1.6vw, 18px);
+            color: var(--text-2);
+            max-width: 760px;
         }
         .wrap-up strong { color: var(--text); }
+
+        /* ── Mobile ── */
         @media (max-width: 900px) {
-          .page { padding: 18px 12px 32px; }
-          .hero { padding: 20px 18px; border-radius: 22px; }
-          .compare-wrap { border-radius: 22px; }
-          .compare-scroll { max-height: none; }
-          .cap-head { min-width: 300px; }
-          .plan-name { font-size: 20px; }
-          .mark { min-width: 140px; }
+            .page { padding: 32px 16px 64px; }
+            .hero { margin-bottom: 40px; }
+            .col-headers {
+                grid-template-columns: 1fr;
+                position: static;
+                border-bottom: none;
+                gap: 10px;
+                padding: 16px 16px 16px;
+            }
+            .col-headers::after { display: none; }
+            .corner { display: none; }
+            .ch {
+                border-left: none;
+                background: var(--cell-bg);
+                border-radius: 10px;
+                padding: 16px;
+                text-align: center;
+            }
+            .ch:last-child { background: var(--highlight); }
+            .ch-name { font-size: 22px; }
+            .ch-name small { font-size: 14px; }
+            .ch-desc { font-size: 14px; }
+            .comparison { border-top-width: 1px; }
+            .cat {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                background: var(--bg);
+                padding: 20px 16px 16px;
+                margin-top: 8px;
+                font-size: 16px;
+                flex-direction: column;
+                justify-content: center;
+                gap: 6px;
+            }
+            .cat i { font-size: 36px; }
+            .row {
+                grid-template-columns: 1fr 1fr 1fr;
+                padding: 12px 16px;
+                gap: 6px;
+                align-items: start;
+            }
+            .cap {
+                grid-column: 1 / -1;
+                padding: 0 0 4px;
+                font-size: 16px;
+            }
+            .v {
+                border-left: none;
+                padding: 0;
+                font-size: 14px;
+                align-items: stretch;
+            }
+            .v:last-child { background: none; }
+            .v .vi {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: baseline;
+                gap: 6px 4px;
+                background: var(--cell-bg);
+                border-radius: 8px;
+                padding: 10px 8px;
+            }
+            .v .vi::before {
+                display: block;
+                content: attr(data-label);
+                font-size: 14px;
+                font-weight: 800;
+                letter-spacing: -0.02em;
+                color: var(--text);
+            }
+            .v .vi[data-sub]::after {
+                content: attr(data-sub);
+                font-size: 11px;
+                font-weight: 600;
+                color: var(--text-3);
+            }
+            .v i { font-size: 33px; flex-basis: 100%; text-align: center; order: 1; }
+            .v:last-child .vi { background: var(--highlight); }
+            .v small {
+                font-size: 10px;
+                text-align: center;
+                margin-top: 4px;
+            }
+            .wrap-up { margin-top: 40px; padding: 20px 0; border-top-width: 1px; }
         }
     </style>
 </head>
 <body>
 <div class="page">
-    <section class="hero">
-        <div class="eyebrow">Comparison</div>
-        <h1>Chi, Nexus and the next steps</h1>
-        <p class="lead">A proudly Bittensor-gnostic framework for building production-ready subnets</p>
-        <div class="headline">Subnets should be created with agents, not hand-built from scratch.</div>
+    <header class="hero">
+        <div class="tag">Comparison</div>
+        <h1>Chi, Nexus &amp;<br>the next steps</h1>
+        <p class="subtitle">A proudly Bittensor-gnostic framework for building production-ready subnets</p>
+        <p class="callout">Subnets should be created with agents, not hand-built from scratch.</p>
         <p class="lead">
             <a href="https://github.com/unconst/Chi">Const's Chi</a> helps shape the Bittensor-native design.
             <a href="https://github.com/bittensor-church/nexus-subnet-template#readme">Nexus</a> gives agents and
@@ -256,375 +347,301 @@
             <strong>Solve common subnet plumbing once</strong>, then let every Nexus-based subnet inherit it.
         </p>
         <div class="legend">
-            <span class="pill"><strong>Chi</strong>: ✅ implemented · ⛔ not supported</span>
-            <span class="pill"><strong>Nexus</strong>: ✅ implemented · 🚧 in progress · ⛔ not supported</span>
-            <span class="pill"><strong>Next steps</strong>: 🟢 core · 🟡 supporting · 🔹 experimental</span>
+            <span><strong>Chi</strong>&ensp;<i class="ph ph-check-circle s-done"></i> implemented · <i class="ph ph-minus s-no"></i> not supported</span>
+            <span><strong>Nexus</strong>&ensp;<i class="ph ph-check-circle s-done"></i> implemented · <i class="ph ph-wrench s-wip"></i> in progress · <i class="ph ph-minus s-no"></i> not supported</span>
+            <span><strong>Next</strong>&ensp;<i class="ph ph-check-circle s-core"></i> core · <i class="ph ph-circle s-support"></i> supporting · <i class="ph ph-flask s-exp"></i> experimental</span>
         </div>
-    </section>
+    </header>
 
-    <section class="compare-wrap">
-        <div class="compare-scroll">
-            <table>
-                <thead>
-                <tr>
-                    <th class="cap-head">Capability</th>
-                    <th>
-                        <div class="plan-head">
-                            <div class="plan-title">
-                                <div class="plan-name">Chi</div>
-                                <span class="badge badge-current">Original</span>
-                            </div>
-                            <div class="plan-sub">Bittensor-native design guidance; can also produce a direct
-                                prototype.
-                            </div>
-                        </div>
-                    </th>
-                    <th>
-                        <div class="plan-head">
-                            <div class="plan-title">
-                                <div class="plan-name">Nexus <small>v0</small></div>
-                                <span class="badge badge-current">Current</span>
-                            </div>
-                            <div class="plan-sub">Current template and framework path for Chi-designed subnet
-                                implementation.
-                            </div>
-                        </div>
-                    </th>
-                    <th>
-                        <div class="plan-head primary">
-                            <div class="plan-title">
-                                <div class="plan-name">Nexus</div>
-                                <span class="badge badge-best">Next steps</span>
-                            </div>
-                            <div class="plan-sub">Core, supporting, and experimental capabilities to prioritize
-                                together.
-                            </div>
-                        </div>
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr class="cat-row">
-                    <th class="cap">✨ Bittensor framing guidance</th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th class="cap">Mechanism design</th>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                </tr>
-                <tr>
-                    <th class="cap">Incentive patterns</th>
-                    <td class="mark small">✅ (basic)</td>
-                    <td class="mark small">✅ (basic)</td>
-                    <td class="mark small">✅ (production ready)</td>
-                </tr>
-                <tr>
-                    <th class="cap">Anti-gaming mechanisms</th>
-                    <td class="mark small">✅ (basic)</td>
-                    <td class="mark small">✅ (basic)</td>
-                    <td class="mark small">✅ (production ready)</td>
-                </tr>
-                <tr>
-                    <th class="cap">Miner-validator contract</th>
-                    <td class="mark small">✅ (basic)</td>
-                    <td class="mark small">✅ (basic)</td>
-                    <td class="mark small">✅ (production ready)</td>
-                </tr>
-                <tr>
-                    <th class="cap">External integration examples</th>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                </tr>
-                <tr>
-                    <th class="cap">Successful subnet case studies</th>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                </tr>
-
-                <tr class="cat-row">
-                    <th class="cap">🛡 Security &amp; Trust</th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th class="cap">Anti–Weight-Copier Hyperparameters (Liquid Alpha)</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Commit–Reveal</th>
-                    <td class="mark">✅</td>
-                    <td class="mark small">✅
-                        <div class="note">with on-chain verification path</div>
-                    </td>
-                    <td class="mark">✅</td>
-                </tr>
-                <tr>
-                    <th class="cap">Validator Hotkey Isolation (Pylon)</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                </tr>
-                <tr>
-                    <th class="cap">Secure miner communication</th>
-                    <td class="mark small">⛔
-                        <div class="note">epistula signing present though</div>
-                    </td>
-                    <td class="mark">🚧</td>
-                    <td class="mark small">🟡
-                        <div class="note">TLS integration and/or ecosystem work like
-                            <a href="https://epistula.sybil.com/why-epistula">Epistula</a> and
-                            <a href="https://github.com/inference-labs-inc/btlightning">btlightning</a>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="cap">DDoS Shield for Miners</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🚧</td>
-                    <td class="mark">🟡</td>
-                </tr>
-                <tr>
-                    <th class="cap">Miner Collateral &amp; Slashing</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟡</td>
-                </tr>
-                <tr>
-                    <th class="cap">Validator Runtime Image Attestation</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🔹</td>
-                </tr>
-                <tr>
-                    <th class="cap">Miner “Dancing”</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🔹</td>
-                </tr>
-                <tr>
-                    <th class="cap">Relay Mining Protection</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🔹</td>
-                </tr>
-                <tr>
-                    <th class="cap">Proof-of-Weights</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🔹</td>
-                </tr>
-
-                <tr class="cat-row">
-                    <th class="cap">⚙️ Reliability &amp; Infrastructure Performance</th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th class="cap">Reliable Weight Setting (Chain Instability)</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                </tr>
-                <tr>
-                    <th class="cap">Resiliency to Restarts</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark small">⛔
-                        <div class="note">the validator is functional after restart, but the state is not persisted and
-                            interrupted operations are not resumed
-                        </div>
-                    </td>
-                    <td class="mark">✅</td>
-                </tr>
-                <tr>
-                    <th class="cap">Retries &amp; Timeouts Framework</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                </tr>
-                <tr>
-                    <th class="cap">Connection Pooling</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Metagraph Caching</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                </tr>
-                <tr>
-                    <th class="cap">Compute Scalability</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🔹</td>
-                </tr>
-                <tr>
-                    <th class="cap">Failure isolation / locality</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                </tr>
-
-                <tr class="cat-row">
-                    <th class="cap">🧠 Subnet Operating Patterns</th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th class="cap">Synthetic Challenge Pattern</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🚧</td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Organic Task Flow Pattern</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">✅</td>
-                    <td class="mark">✅</td>
-                </tr>
-                <tr>
-                    <th class="cap">Knowledge Commitment Pattern</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Monetization primitives: burning, allowances, alpha payments</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🔹</td>
-                </tr>
-
-                <tr class="cat-row">
-                    <th class="cap">🔄 Validator Oversight &amp; Coordination</th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th class="cap">Validator Autoupdater</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Dynamic On-Chain Configuration</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Upgrade workflows for framework improvements</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Validator Metrics System</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Logs &amp; Error Tracking (Sentry)</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Grafana Dashboards</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟡</td>
-                </tr>
-                <tr>
-                    <th class="cap">Audit Log Inspection</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark small">⛔
-                        <div class="note">all activity is put into audit log, but there is no inspection facility yet
-                        </div>
-                    </td>
-                    <td class="mark">🟡</td>
-                </tr>
-                <tr>
-                    <th class="cap">Stake-Based Voting</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🔹</td>
-                </tr>
-
-                <tr class="cat-row">
-                    <th class="cap">📦 DevEx &amp; Supply Chain</th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th class="cap">End-to-End Localnet Integration</th>
-                    <td class="mark">
-                        ⛔
-                        <div class="note">only some local setup instructions</div>
-                    </td>
-                    <td class="mark small">🚧
-                        <div class="note">current Catnet demo includes localnet artifacts and verification flow</div>
-                    </td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Agentic Coding Readiness</th>
-                    <td class="mark">
-                        ⛔
-                        <div class="note">sparse guidelines</div>
-                    </td>
-                    <td class="mark">
-                        🚧
-                        <div class="note">localnet setup closing agentic self-verification loops</div>
-                    </td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Supply Chain Setup (CI/CD, Docker, PyPI)</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Validator Image Build Pipeline</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark">⛔</td>
-                    <td class="mark">🟢</td>
-                </tr>
-                <tr>
-                    <th class="cap">Local &amp; Automated Testing</th>
-                    <td class="mark">⛔</td>
-                    <td class="mark small">✅
-                        <div class="note">basic scoring and weight calculation tests in the demo path</div>
-                    </td>
-                    <td class="mark">🟢</td>
-                </tr>
-                </tbody>
-            </table>
+    <div class="comparison">
+        <div class="col-headers">
+            <div class="corner"></div>
+            <div class="ch">
+                <div class="ch-name">Chi</div>
+                <div class="badge badge-orig">Original</div>
+                <div class="ch-desc">Bittensor-native design guidance; can also produce a direct prototype.</div>
+            </div>
+            <div class="ch">
+                <div class="ch-name">Nexus <small>v0</small></div>
+                <div class="badge badge-curr">Current</div>
+                <div class="ch-desc">Current template and framework for Chi-designed subnet implementation.</div>
+            </div>
+            <div class="ch">
+                <div class="ch-name">Nexus</div>
+                <div class="badge badge-next">Next steps</div>
+                <div class="ch-desc">Core, supporting, and experimental capabilities to prioritize together.</div>
+            </div>
         </div>
-    </section>
-    <section class="wrap-up">
+
+        <!-- ✨ Bittensor framing guidance -->
+        <div class="cat cat-framing"><i class="ph-bold ph-sparkle"></i> Bittensor framing guidance</div>
+        <div class="row">
+            <div class="cap">Mechanism design</div>
+            <div class="v s-done"><span class="vi" data-label="Chi"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Incentive patterns</div>
+            <div class="v s-done"><span class="vi" data-label="Chi"><i class="ph ph-check-circle"></i></span> <small>basic</small></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span> <small>basic</small></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span> <small>production ready</small></div>
+        </div>
+        <div class="row">
+            <div class="cap">Anti-gaming mechanisms</div>
+            <div class="v s-done"><span class="vi" data-label="Chi"><i class="ph ph-check-circle"></i></span> <small>basic</small></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span> <small>basic</small></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span> <small>production ready</small></div>
+        </div>
+        <div class="row">
+            <div class="cap">Miner-validator contract</div>
+            <div class="v s-done"><span class="vi" data-label="Chi"><i class="ph ph-check-circle"></i></span> <small>basic</small></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span> <small>basic</small></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span> <small>production ready</small></div>
+        </div>
+        <div class="row">
+            <div class="cap">External integration examples</div>
+            <div class="v s-done"><span class="vi" data-label="Chi"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Successful subnet case studies</div>
+            <div class="v s-done"><span class="vi" data-label="Chi"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+
+        <!-- 🛡 Security & Trust -->
+        <div class="cat cat-security"><i class="ph-bold ph-shield-check"></i> Security &amp; Trust</div>
+        <div class="row">
+            <div class="cap">Anti–Weight-Copier Hyperparameters (Liquid Alpha)</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Commit–Reveal</div>
+            <div class="v s-done"><span class="vi" data-label="Chi"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span> <small>with on-chain verification path</small></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Validator Hotkey Isolation (Pylon)</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Secure miner communication</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span> <small>epistula signing present though</small></div>
+            <div class="v s-wip"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-wrench"></i></span></div>
+            <div class="v s-support"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-circle"></i></span> <small>TLS integration and/or ecosystem work like
+                <a href="https://epistula.sybil.com/why-epistula">Epistula</a> and
+                <a href="https://github.com/inference-labs-inc/btlightning">btlightning</a></small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="cap">DDoS Shield for Miners</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-wip"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-wrench"></i></span></div>
+            <div class="v s-support"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Miner Collateral &amp; Slashing</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-support"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Validator Runtime Image Attestation</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-exp"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-flask"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Miner "Dancing"</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-exp"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-flask"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Relay Mining Protection</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-exp"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-flask"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Proof-of-Weights</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-exp"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-flask"></i></span></div>
+        </div>
+
+        <!-- ⚙️ Reliability & Infrastructure Performance -->
+        <div class="cat cat-infra"><i class="ph-bold ph-gear-six"></i> Reliability &amp; Infrastructure Performance</div>
+        <div class="row">
+            <div class="cap">Reliable Weight Setting (Chain Instability)</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Resiliency to Restarts</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span> <small>functional after restart, but state is not persisted and interrupted operations are not resumed</small></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Retries &amp; Timeouts Framework</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Connection Pooling</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Metagraph Caching</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Compute Scalability</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-exp"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-flask"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Failure isolation / locality</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+
+        <!-- 🧠 Subnet Operating Patterns -->
+        <div class="cat cat-patterns"><i class="ph-bold ph-brain"></i> Subnet Operating Patterns</div>
+        <div class="row">
+            <div class="cap">Synthetic Challenge Pattern</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-wip"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-wrench"></i></span></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Organic Task Flow Pattern</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Knowledge Commitment Pattern</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Monetization primitives: burning, allowances, alpha payments</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-exp"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-flask"></i></span></div>
+        </div>
+
+        <!-- 🔄 Validator Oversight & Coordination -->
+        <div class="cat cat-oversight"><i class="ph-bold ph-arrows-clockwise"></i> Validator Oversight &amp; Coordination</div>
+        <div class="row">
+            <div class="cap">Validator Autoupdater</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Dynamic On-Chain Configuration</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Upgrade workflows for framework improvements</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Validator Metrics System</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Logs &amp; Error Tracking (Sentry)</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Grafana Dashboards</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-support"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Audit Log Inspection</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span> <small>all activity is put into audit log, but there is no inspection facility yet</small></div>
+            <div class="v s-support"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Stake-Based Voting</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-exp"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-flask"></i></span></div>
+        </div>
+
+        <!-- 📦 DevEx & Supply Chain -->
+        <div class="cat cat-devex"><i class="ph-bold ph-package"></i> DevEx &amp; Supply Chain</div>
+        <div class="row">
+            <div class="cap">End-to-End Localnet Integration</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span> <small>only some local setup instructions</small></div>
+            <div class="v s-wip"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-wrench"></i></span> <small>Catnet demo includes localnet artifacts and verification flow</small></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Agentic Coding Readiness</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span> <small>sparse guidelines</small></div>
+            <div class="v s-wip"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-wrench"></i></span> <small>localnet setup closing agentic self-verification loops</small></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Supply Chain Setup (CI/CD, Docker, PyPI)</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Validator Image Build Pipeline</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-no"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+        <div class="row">
+            <div class="cap">Local &amp; Automated Testing</div>
+            <div class="v s-no"><span class="vi" data-label="Chi"><i class="ph ph-minus"></i></span></div>
+            <div class="v s-done"><span class="vi" data-label="Nexus" data-sub="v0"><i class="ph ph-check-circle"></i></span> <small>basic scoring and weight calculation tests</small></div>
+            <div class="v s-core"><span class="vi" data-label="Nexus" data-sub="Next"><i class="ph ph-check-circle"></i></span></div>
+        </div>
+    </div>
+
+    <footer class="wrap-up">
         <p>
             <strong>Every capability built into Nexus becomes available to every Nexus-based subnet.</strong>
             Bittensor already has great subnets with impressive tooling and engineering; Nexus can make that level of
             operational quality much more common, narrowing the gap between the best-run subnets and the average subnet.
         </p>
-    </section>
+    </footer>
 </div>
 </body>
 </html>
