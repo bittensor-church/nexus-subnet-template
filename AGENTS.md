@@ -123,6 +123,23 @@ consistently with the Nexus patterns you find there. If you expose a validator
 `/metrics` endpoint, add it into `envs/deployed/docker-compose.yml.jinja`
 scrape targets and update `installer/README.md.jinja`.
 
+#### Structured logging
+
+The validator emits structured logs via `structlog`
+(`validator/src/validator/logging_config.py`). `configure_logging(logging_settings)` is called
+from `main()` right after `load_dotenv` and before Sentry, taking a `LoggingSettings`
+instance built separately from the main `Settings` and read from `VALIDATOR_LOGGING_`-prefixed
+environment variables. Three orthogonal knobs control output: `VALIDATOR_LOGGING_FORMAT`
+(`json` default, or `console` for pretty,
+colored development logs), `VALIDATOR_LOGGING_ROOT_LEVEL` (`INFO` default — `format` no longer
+implies a level, so set this to `DEBUG` explicitly for verbose logs), and
+`VALIDATOR_LOGGING_LEVELS` (a single JSON-encoded per-logger map, default
+`{"httpx":"WARNING","httpcore":"WARNING"}`, that replaces the default wholesale when set). All
+stdlib logging (Nexus `get_logger`, httpx, validator modules) flows through a single root
+handler via `logging.config.dictConfig`, and a minimal `structlog.configure()` routes native
+`structlog.get_logger(...)` calls through the same `ProcessorFormatter`, so both produce
+identical output. `disable_existing_loggers=False` preserves Sentry's logging handler.
+
 Skip for higher level tasks that do not touch the code.
 
 ## localnet
