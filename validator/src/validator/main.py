@@ -21,6 +21,7 @@ from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from validator.logging_config import LoggingSettings, configure_logging
+from validator.otel import OtelSettings, setup_otel
 from validator.payload import PingInput, PingPayloadCreator, PongOutput
 from validator.response_logger import ErrorLoggerNode, ResponseLoggerNode
 
@@ -106,6 +107,7 @@ def main(env_file: Path | None) -> None:
     load_dotenv(env_file)
     logging_settings = LoggingSettings()
     configure_logging(logging_settings)
+    setup_otel(OtelSettings())
     _setup_sentry()
     Validator.run(settings_class=Settings)
 

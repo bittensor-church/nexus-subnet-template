@@ -40,6 +40,29 @@ third-party image in the stack (pylon, anything else). There is no "but this
 tag is semver, so it's safe" exception — the registry doesn't care about
 semver.
 
+> Observability sidecars currently ship pinned only by tag (`cadvisor:v0.40.0`,
+> `node-exporter:latest`, `bittensor_prometheus:latest`, `grafana/alloy:v1.15.1`)
+> rather than by digest. This is a known gap, not an endorsement: when hardening
+> the deploy, pin these by `@sha256` too via Procedure 3. The `alloy` traces
+> sidecar (see the tracing notes below) follows the same convention as the rest
+> of the metrics stack for now.
+
+## The traces sidecar (Alloy)
+
+`envs/deployed/docker-compose.yml` runs a `grafana/alloy` sidecar that tail-samples the
+validator's OpenTelemetry spans and forwards them to an OTLP/HTTP upstream. Its config lives
+next to the compose file in `envs/deployed/alloy/config.alloy` and is synced to operator hosts
+by the same `update_compose.sh` cron job (it now fetches both files). **`TRACES_UPSTREAM_URL` /
+`TRACES_UPSTREAM_USER` / `TRACES_UPSTREAM_PASSWORD` are required by the sidecar** — Alloy
+refuses to build its exporter without an endpoint and credentials, so with any of them
+empty the sidecar crash-loops on startup. Bumping the Alloy image or editing the Alloy
+config is a Procedure 3 change (non-validator service) and ships on `deploy-config-<env>`.
+
+> TODO: the intended upstream is the observability proxy (today the Prometheus proxy), mirroring
+> metrics — once it supports traces, point the exporter at it and the proxy will add the operator
+> `hotkey` label. For now `TRACES_UPSTREAM_URL` can target a Tempo backend (or any OTLP upstream)
+> directly.
+
 ## Branches and what they do
 
 Two independent branches drive the deploy. They are **not** the same thing —
@@ -61,15 +84,16 @@ Trigger: the developer wants CI to produce a fresh validator image from
 `master` (or any working branch). This is just CI — nothing is decided about
 operators here.
 
-The default environment is `prod`; for other environments substitute `<env>`
-consistently.
+The default environment is `production` (the branch suffix and the validator's
+OTel `deployment.environment.name` attribute share this single value); for other
+environments substitute `<env>` consistently.
 
 1. Confirm the source branch is green locally (QA gates), `validator/Dockerfile`
    builds, and the container starts.
 2. Fast-forward push the source branch to `deploy-build-<env>`:
 
    ```sh
-   git push origin master:deploy-build-prod
+   git push origin master:deploy-build-production
    ```
 
    The `build-validator.yml` workflow (triggered on `deploy-build-*`) builds
@@ -95,7 +119,7 @@ stack.
 
    ```sh
    docker buildx imagetools inspect \
-     <image_registry>/<github_org>/<image_basename>-prod:sha-<commit> \
+     <image_registry>/<github_org>/<image_basename>-production:sha-<commit> \
      --format '{{json .Manifest.Digest}}'
    ```
 
@@ -107,7 +131,7 @@ stack.
    Pull and run **by digest only**:
 
    ```sh
-   docker pull <image_registry>/<github_org>/<image_basename>-prod@sha256:<digest>
+   docker pull <image_registry>/<github_org>/<image_basename>-production@sha256:<digest>
    ```
 
    Bring up the full stack and confirm validator and pylon are healthy. This
@@ -120,11 +144,11 @@ stack.
    image: <image_registry>/<github_org>/<image_basename>-${ENVIRONMENT:?}@sha256:<digest>
    ```
 
-4. Commit (e.g. `chore(deploy): pin prod validator to <digest-prefix>`), push
-   `master`, then fast-forward `master` → `deploy-config-prod`:
+4. Commit (e.g. `chore(deploy): pin production validator to <digest-prefix>`), push
+   `master`, then fast-forward `master` → `deploy-config-production`:
 
    ```sh
-   git push origin master:deploy-config-prod
+   git push origin master:deploy-config-production
    ```
 
    From this point, the cron-driven `update_compose.sh` on operator hosts will
@@ -183,11 +207,11 @@ validator needs a newer pylon than the one the template ships with.
    image: backenddevelopersltd/bittensor-pylon@sha256:<digest>
    ```
 
-5. Commit (e.g. `chore(deploy): pin prod pylon to <digest-prefix>`), push
-   `master`, then fast-forward `master` → `deploy-config-prod`:
+5. Commit (e.g. `chore(deploy): pin production pylon to <digest-prefix>`), push
+   `master`, then fast-forward `master` → `deploy-config-production`:
 
    ```sh
-   git push origin master:deploy-config-prod
+   git push origin master:deploy-config-production
    ```
 
 If procedure 2 needs an accompanying service bump, run procedure 3 first

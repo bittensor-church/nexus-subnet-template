@@ -25,8 +25,49 @@ services:
     env_file: ./.env
     environment:
       VALIDATOR_PYLON_SERVICE_ADDRESS: "http://pylon:8000"
+      # Traces OFF: the `alloy` sidecar is commented out below, so SDK_DISABLED
+      # stops the validator from exporting to a non-existent collector. Drop this
+      # line when re-enabling the `alloy` service.
+
+      # TODO: At template bootstrap ask user if they want to send metrics to CoR grafana, to their own stack or disable it entirely.
+      VALIDATOR_OTEL_SDK_DISABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
     depends_on:
       - pylon
+
+  # Traces sidecar (Grafana Alloy) — DISABLED for now.
+  #
+  # With empty TRACES_UPSTREAM_* this sidecar crash-loops: alloy/config.alloy
+  # declares an `otelcol.auth.basic` + `otelcol.exporter.otlphttp` pair, and
+  # Alloy v1.15.1 refuses to build those components without credentials / an
+  # endpoint ("no credential source provided" / "at least one endpoint must be
+  # specified"), so `alloy run` fails the initial load. There is no real traces
+  # upstream to forward to yet, so the whole service stays commented out and the
+  # validator runs with VALIDATOR_OTEL_SDK_DISABLED=true (above).
+  #
+  # TODO: re-enable once the observability proxy (today the Prometheus proxy /
+  #       bittensor-prometheus-proxy; renaming to observability proxy) supports
+  #       traces. Then: uncomment this service + the `alloy-data` volume, point
+  #       the exporter at the proxy (the intended OTLP upstream; you can also
+  #       target a Tempo backend / any OTLP-compatible upstream directly), fill
+  #       TRACES_UPSTREAM_* in .env, and drop VALIDATOR_OTEL_SDK_DISABLED from
+  #       the validator. The Alloy config lives in envs/deployed/alloy/config.alloy.
+  #
+  # alloy:
+  #   image: grafana/alloy:v1.15.1
+  #   restart: unless-stopped
+  #   environment:
+  #     TRACES_UPSTREAM_URL: "${TRACES_UPSTREAM_URL:-}"
+  #     TRACES_UPSTREAM_USER: "${TRACES_UPSTREAM_USER:-}"
+  #     TRACES_UPSTREAM_PASSWORD: "${TRACES_UPSTREAM_PASSWORD:-}"
+  #   volumes:
+  #     - ./alloy:/etc/alloy:ro
+  #     - alloy-data:/var/lib/alloy
+  #   command:
+  #     - run
+  #     - --storage.path=/var/lib/alloy/data
+  #     - /etc/alloy/config.alloy
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.40.0
@@ -101,3 +142,6 @@ services:
       SENTRY_DSN: "${SENTRY_DSN:-}"
     volumes:
       - "${HOST_WALLET_DIR:?}:/root/.bittensor/wallets"
+
+# volumes:
+#   alloy-data: {}  # uncomment together with the `alloy` service above
