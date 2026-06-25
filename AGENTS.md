@@ -123,6 +123,12 @@ consistently with the Nexus patterns you find there. If you expose a validator
 `/metrics` endpoint, add it into `envs/deployed/docker-compose.yml.jinja`
 scrape targets and update `installer/README.md.jinja`.
 
+#### Structured logging
+
+The validator logs exclusively via `structlog`. Logging and structlog are configured in
+`validator/src/validator/logging_config.py`, tunable via `VALIDATOR_LOGGING_`-prefixed
+environment variables.
+
 Skip for higher level tasks that do not touch the code.
 
 ## localnet

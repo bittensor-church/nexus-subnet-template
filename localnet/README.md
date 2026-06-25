@@ -57,7 +57,8 @@ Creates owner and validator wallets, funds them from Alice (pre-funded devnet ac
 cd validator && uv sync && uv run validator --env-file ../localnet/.env
 ```
 
-The `localnet/.env` is pre-configured to connect to the local pylon.
+The `localnet/.env` is pre-configured to connect to the local pylon. It also sets
+`VALIDATOR_LOGGING_FORMAT=console` for pretty, colored console logs.
 
 ## Running the miner
 

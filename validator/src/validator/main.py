@@ -20,6 +20,7 @@ from nexus.v1 import (
 from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from validator.logging_config import LoggingSettings, configure_logging
 from validator.payload import PingInput, PingPayloadCreator, PongOutput
 from validator.response_logger import ErrorLoggerNode, ResponseLoggerNode
 
@@ -97,11 +98,14 @@ def _setup_sentry() -> None:
         ],
     )
 
+
 @click.command()
 @click.option("--env-file", type=click.Path(exists=True, dir_okay=False, path_type=Path), default=None)
 def main(env_file: Path | None) -> None:
     """CLI entry point: load env from --env-file (if given) and run the validator."""
     load_dotenv(env_file)
+    logging_settings = LoggingSettings()
+    configure_logging(logging_settings)
     _setup_sentry()
     Validator.run(settings_class=Settings)
 

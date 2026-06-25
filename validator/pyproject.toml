@@ -10,6 +10,7 @@ dependencies = [
     "pydantic-settings>=2.14.0",
     "python-dotenv>=1.2.2",
     "sentry-sdk>=2.60.0",
+    "structlog>=25,<27",
 ]
 
 [project.scripts]
