@@ -58,9 +58,7 @@ cd validator && uv sync && uv run validator --env-file ../localnet/.env
 ```
 
 The `localnet/.env` is pre-configured to connect to the local pylon. It also sets
-`VALIDATOR_LOGGING_FORMAT=console` for pretty, colored console logs (production defaults to
-line-delimited JSON), while keeping `VALIDATOR_LOGGING_ROOT_LEVEL=INFO` (set it to `DEBUG` for
-verbose development logging); leave both unset (as production deployments do) to emit JSON at `INFO`.
+`VALIDATOR_LOGGING_FORMAT=console` for pretty, colored console logs.
 
 ## Running the miner
 

@@ -27,14 +27,7 @@ class LogFormat(enum.StrEnum):
 
 
 class LoggingSettings(BaseSettings):
-    """Configuration for the validator's structured logging.
-
-    All fields are overridable via ``VALIDATOR_LOGGING_``-prefixed environment
-    variables; the defaults reproduce the validator's production logging
-    behaviour. ``levels`` maps individual logger names to their level and is
-    read from a single JSON-encoded environment variable
-    (for example ``VALIDATOR_LOGGING_LEVELS='{"httpx":"WARNING"}'``).
-    """
+    """Configuration for the validator's structured logging."""
 
     model_config = SettingsConfigDict(env_prefix="VALIDATOR_LOGGING_", extra="ignore")
 
@@ -113,20 +106,6 @@ def _configure_structlog() -> None:
 
 
 def configure_logging(settings: LoggingSettings) -> None:
-    """Install the global logging configuration.
-
-    Applies a stdlib :func:`logging.config.dictConfig` whose single stream
-    handler renders pretty console output when ``settings.format`` is
-    :attr:`LogFormat.CONSOLE` and line-delimited JSON when it is
-    :attr:`LogFormat.JSON`, sets the root logger to ``settings.root_level``,
-    applies the per-logger overrides from ``settings.levels``, and points native
-    ``structlog`` loggers at the same formatter. Uses
-    ``disable_existing_loggers=False`` so handlers added by other libraries (for
-    example Sentry's logging integration) are preserved.
-
-    Args:
-        settings: Resolved logging configuration controlling renderer, root
-            level, and per-logger level overrides.
-    """
+    """Install the global stdlib logging and structlog configuration."""
     logging.config.dictConfig(_build_dict_config(settings))
     _configure_structlog()
