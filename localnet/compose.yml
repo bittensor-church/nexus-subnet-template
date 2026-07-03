@@ -11,7 +11,7 @@ services:
       retries: 10
 
   pylon:
-    image: backenddevelopersltd/bittensor-pylon:2.0.0
+    image: backenddevelopersltd/bittensor-pylon:2.1.0
     ports:
       - "8000:8000"
     environment:
