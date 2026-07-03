@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.14"
 
 [options]
-exclude-newer = "2026-06-11T15:15:45.554406841Z"
+exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
 exclude-newer-span = "P11D"
 
 [[package]]
@@ -62,8 +62,8 @@ wheels = [
 
 [[package]]
 name = "bittensor-nexus-library"
-version = "0.0.1.dev162+gb6f4814eb"
-source = { git = "https://github.com/bittensor-church/bittensor-nexus-library.git#b6f4814eb4e1c4eab85f428b2b1008f66f2730e8" }
+version = "0.0.1.dev165+ge1f0b6829"
+source = { git = "https://github.com/bittensor-church/bittensor-nexus-library.git#e1f0b682968a09742e82215d9a512572ba33b7e5" }
 dependencies = [
     { name = "bittensor-pylon-client" },
     { name = "boto3" },
@@ -78,7 +78,7 @@ dependencies = [
 
 [[package]]
 name = "bittensor-pylon-client"
-version = "2.0.0"
+version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "apscheduler" },
@@ -88,9 +88,9 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "tenacity" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8c/1e/e393c1ec9f5bd11e807c7f51003ac9e7efa6ba1070eecfd958ca41d7eb2f/bittensor_pylon_client-2.0.0.tar.gz", hash = "sha256:93e4023e359288e94c822e2b3e0fb4d3ab447446d962979d512f122edd30a9b6", size = 25728, upload-time = "2026-05-13T15:32:07.837Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/96/d6/5696c608ee25c5477b38aa5cafa996ad1eb570d8525ad2be9c10a2b05745/bittensor_pylon_client-2.1.0.tar.gz", hash = "sha256:30e87537ed43e22fc4236b8c4a342e97424ee225826c2d1f556a8a71b23a3a15", size = 26138, upload-time = "2026-05-29T14:19:04.143Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/da/9c/96388f1fac76616c6acef74a370131e48a207d51a787951534da6cab9827/bittensor_pylon_client-2.0.0-py3-none-any.whl", hash = "sha256:a9daa2e9653ca88bf7c5a420466d421caf7b55d8e0f7446f742e7b699f307396", size = 52601, upload-time = "2026-05-13T15:32:06.425Z" },
+    { url = "https://files.pythonhosted.org/packages/44/f6/653e4c17b288034e3d41f727efa345cb3ae6ec3fe029300196d357266e46/bittensor_pylon_client-2.1.0-py3-none-any.whl", hash = "sha256:4908bd266bfba56e98e026deadf57b414d2bb019120dee0c8288e6fb181faefa", size = 53098, upload-time = "2026-05-29T14:19:02.936Z" },
 ]
 
 [[package]]
