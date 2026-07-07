@@ -69,8 +69,8 @@ current state of the subnet); `validator/Dockerfile` builds locally without erro
 **definition of done:**
 
 - `validator/Dockerfile` built locally without errors as a sanity check before promotion
-- procedure 1 (build) ran on `deploy-build-prod`: `build-validator.yml` finished successfully
-  and pushed `<image_registry>/<github_org>/<image_basename>-prod:v0-latest` and
+- procedure 1 (build) ran on `deploy-build-production`: `build-validator.yml` finished successfully
+  and pushed `<image_registry>/<github_org>/<image_basename>-production:v0-latest` and
   `...:sha-<commit>` to the configured registry
 
 **after done:** release the validator
@@ -89,7 +89,7 @@ current state of the subnet); `validator/Dockerfile` builds locally without erro
 - the pylon digest already pinned in `envs/deployed/docker-compose.yml` by the template is
   current enough for this validator; if the validator requires a newer pylon, procedure 3
   (promote pylon) ran too, updating the pylon digest on `master`
-- branch `deploy-config-prod` points at the same commit as `master`, so an operator pulling
+- branch `deploy-config-production` points at the same commit as `master`, so an operator pulling
   `installer/install.sh` from this branch gets a consistent set of installer, `update_compose.sh`,
   and `docker-compose.yml`
 - smoke test: `bash installer/install.sh` on a clean Linux host (a fresh VM or container, not

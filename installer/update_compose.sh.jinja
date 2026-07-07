@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# Pulls the latest envs/deployed/docker-compose.yml from the deploy-config-${ENV_NAME} branch
-# and restarts the {{ subnet_name }} validator stack if anything changed.
+# Pulls the latest envs/deployed/docker-compose.yml and the Alloy traces config
+# from the deploy-config-${ENV_NAME} branch and restarts the {{ subnet_name }}
+# validator stack if anything changed.
 
 set -euo pipefail
 
-ENV_NAME="${1:-prod}"
+# ENV_NAME is both the deploy-config branch suffix (deploy-config-${ENV_NAME}) and the
+# OpenTelemetry deployment.environment.name attribute backfilled into .env below.
+ENV_NAME="${1:-production}"
 WORKING_DIRECTORY="${2:-$HOME/{{ working_dir_name }}/}"
 
 mkdir -p "${WORKING_DIRECTORY}"
@@ -16,27 +19,57 @@ if [ -f "${ENV_FILE}" ] && ! grep -q '^ENVIRONMENT=' "${ENV_FILE}"; then
 fi
 
 GITHUB_URL="https://raw.githubusercontent.com/{{ github_org }}/{{ github_repo }}/refs/heads"
+BRANCH_URL="${GITHUB_URL}/deploy-config-${ENV_NAME}"
 
-TEMP_FILE="$(mktemp "${TMPDIR:-/tmp}/{{ subnet_slug }}_compose_update.XXXXXX.yml")"
-trap 'rm -f "${TEMP_FILE}"' EXIT
-curl -fsSL "${GITHUB_URL}/deploy-config-${ENV_NAME}/envs/deployed/docker-compose.yml" > "${TEMP_FILE}"
+UPDATED=false
 
-LOCAL_FILE="${WORKING_DIRECTORY}/docker-compose.yml"
+TEMP_FILES=()
+cleanup() {
+    if [ "{% raw %}${#TEMP_FILES[@]}{% endraw %}" -gt 0 ]; then
+        rm -f "${TEMP_FILES[@]}"
+    fi
+}
+trap cleanup EXIT
 
-if [ ! -f "${LOCAL_FILE}" ]; then
-    echo "Local docker-compose.yml does not exist. Creating it."
-    cat "${TEMP_FILE}" > "${LOCAL_FILE}"
-    UPDATED=true
-else
-    if diff -q "${TEMP_FILE}" "${LOCAL_FILE}" > /dev/null; then
-        echo "No changes detected in docker-compose.yml"
-        UPDATED=false
+# fetch_file <remote-path> <temp-file>: all downloads must succeed before any
+# local files are replaced, so fetching and applying are kept separate.
+fetch_file() {
+    local remote_path="$1"
+    local temp_file="$2"
+    if ! curl -fsSL "${BRANCH_URL}/${remote_path}" > "${temp_file}"; then
+        echo "Error: failed to fetch ${remote_path}. Aborting update."
+        return 1
+    fi
+}
+
+# apply_file <temp-file> <local-path>: replace the local copy and flag an update if it changed.
+apply_file() {
+    local temp_file="$1"
+    local local_path="$2"
+    mkdir -p "$(dirname "${local_path}")"
+    if [ ! -f "${local_path}" ]; then
+        echo "Local ${local_path} does not exist. Creating it."
+        cat "${temp_file}" > "${local_path}"
+        UPDATED=true
+    elif diff -q "${temp_file}" "${local_path}" > /dev/null; then
+        echo "No changes detected in ${local_path}"
     else
-        echo "Changes detected in docker-compose.yml. Updating..."
-        cat "${TEMP_FILE}" > "${LOCAL_FILE}"
+        echo "Changes detected in ${local_path}. Updating..."
+        cat "${temp_file}" > "${local_path}"
         UPDATED=true
     fi
-fi
+}
+
+COMPOSE_TEMP="$(mktemp "${TMPDIR:-/tmp}/{{ subnet_slug }}_update.XXXXXX")"
+TEMP_FILES+=("${COMPOSE_TEMP}")
+ALLOY_TEMP="$(mktemp "${TMPDIR:-/tmp}/{{ subnet_slug }}_update.XXXXXX")"
+TEMP_FILES+=("${ALLOY_TEMP}")
+
+fetch_file "envs/deployed/docker-compose.yml" "${COMPOSE_TEMP}"
+fetch_file "envs/deployed/alloy/config.alloy" "${ALLOY_TEMP}"
+
+apply_file "${COMPOSE_TEMP}" "${WORKING_DIRECTORY}/docker-compose.yml"
+apply_file "${ALLOY_TEMP}" "${WORKING_DIRECTORY}/alloy/config.alloy"
 
 if [ "${UPDATED}" = true ]; then
     echo "Updating services..."

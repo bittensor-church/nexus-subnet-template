@@ -1,0 +1,151 @@
+"""OpenTelemetry distributed tracing for the validator.
+
+Sets up a global ``TracerProvider`` exporting spans over OTLP HTTP and
+auto-instruments the ``httpx`` clients Nexus uses to talk to miners. The whole
+subsystem is a no-op unless an OTLP endpoint is configured, so the validator
+runs unchanged when tracing is disabled.
+
+Two structlog processors (:func:`add_otel_context_to_structlog` and
+:func:`add_otel_resource_to_structlog`) bridge traces and logs: they stamp the
+active span's ``trace_id``/``span_id`` and the OTel resource attributes onto
+every log line, so logs and spans share one identity in backends like
+Tempo/Loki. They are wired in from :mod:`validator.logging_config`.
+
+Operator identity (the validator's hotkey) is intentionally **not** attached
+here. Once traces are routed through the observability proxy (today the
+Prometheus proxy), the proxy authenticates the operator and adds the ``hotkey``
+label itself — mirroring how metrics already work.
+"""
+
+from __future__ import annotations
+
+import functools
+from typing import TYPE_CHECKING, Any, Final
+
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.semconv.attributes.deployment_attributes import DEPLOYMENT_ENVIRONMENT_NAME
+from opentelemetry.semconv.attributes.service_attributes import SERVICE_NAME, SERVICE_NAMESPACE, SERVICE_VERSION
+from pydantic import AliasChoices, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+if TYPE_CHECKING:
+    from structlog.typing import EventDict, WrappedLogger
+
+_BITTENSOR_NETUID_ATTR: Final = "bittensor.netuid"
+_BITTENSOR_NETWORK_ATTR: Final = "bittensor.network"
+
+
+class OtelSettings(BaseSettings):
+    """Configuration for the validator's OpenTelemetry tracing.
+
+    The OTLP exporter endpoint and protocol are not declared here — the SDK reads
+    them from the standard ``OTEL_EXPORTER_OTLP_*`` variables, and tracing stays a
+    no-op until ``OTEL_EXPORTER_OTLP_ENDPOINT`` is set.
+    """
+
+    model_config = SettingsConfigDict(env_prefix="VALIDATOR_OTEL_", extra="ignore")
+
+    sdk_disabled: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("VALIDATOR_OTEL_SDK_DISABLED", "OTEL_SDK_DISABLED"),
+    )
+    exporter_otlp_endpoint: str = Field(
+        default="",
+        validation_alias=AliasChoices("VALIDATOR_OTEL_EXPORTER_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_ENDPOINT"),
+    )
+    service_namespace: str = "sn{{ default_netuid }}-{{ subnet_slug }}"
+    service_name: str = "validator"
+    deployment_environment: str = Field(
+        default="production",
+        validation_alias=AliasChoices(
+            "VALIDATOR_OTEL_DEPLOYMENT_ENVIRONMENT",
+            "OTEL_DEPLOYMENT_ENVIRONMENT",
+            "ENVIRONMENT",
+        ),
+    )
+    service_version: str = Field(
+        default="",
+        validation_alias=AliasChoices("VALIDATOR_OTEL_SERVICE_VERSION", "OTEL_SERVICE_VERSION", "GIT_SHA"),
+    )
+    # Sourced from the deployment's existing ``.env`` (``NETUID`` / ``BITTENSOR_NETWORK``).
+    netuid: str = Field(default="{{ default_netuid }}", validation_alias=AliasChoices("VALIDATOR_OTEL_NETUID", "NETUID"))
+    bittensor_network: str = Field(
+        default="{{ default_network }}",
+        validation_alias=AliasChoices("VALIDATOR_OTEL_BITTENSOR_NETWORK", "BITTENSOR_NETWORK"),
+    )
+
+    @property
+    def traces_enabled(self) -> bool:
+        """Whether span export is enabled."""
+        return not self.sdk_disabled and bool(self.exporter_otlp_endpoint.strip())
+
+    def resource_attributes(self) -> dict[str, str]:
+        """OTel resource attributes for traces and log correlation.
+
+        Deliberately omits the operator hotkey — the observability proxy adds it downstream.
+        """
+        attrs: dict[str, str] = {
+            SERVICE_NAMESPACE: self.service_namespace,
+            SERVICE_NAME: self.service_name,
+            DEPLOYMENT_ENVIRONMENT_NAME: self.deployment_environment,
+            SERVICE_VERSION: self.service_version,
+            _BITTENSOR_NETUID_ATTR: self.netuid,
+            _BITTENSOR_NETWORK_ATTR: self.bittensor_network,
+        }
+        return {key: value for key, value in attrs.items() if value}
+
+
+def _build_span_processor() -> Any:
+    """Build the span processor. Split out so tests can swap in an in-memory exporter."""
+    return BatchSpanProcessor(OTLPSpanExporter())
+
+
+def setup_otel(settings: OtelSettings) -> None:
+    """Install the global tracer provider and auto-instrument ``httpx``. A no-op when tracing is disabled."""
+    if not settings.traces_enabled:
+        return
+
+    resource = Resource.create(settings.resource_attributes())
+    provider = TracerProvider(resource=resource)
+    provider.add_span_processor(_build_span_processor())
+    trace.set_tracer_provider(provider)
+
+    HTTPXClientInstrumentor().instrument()
+
+
+@functools.cache
+def _log_resource_attributes() -> dict[str, str]:
+    """Resource attributes stamped onto every log line. Cached: static for the process lifetime."""
+    return OtelSettings().resource_attributes()
+
+
+def add_otel_context_to_structlog(
+    logger: WrappedLogger,
+    method_name: str,
+    event_dict: EventDict,
+) -> EventDict:
+    """Structlog processor injecting the active span's ``trace_id``/``span_id``.
+
+    When tracing is disabled the current span is the no-op span whose context
+    is invalid, so no fields are added.
+    """
+    ctx = trace.get_current_span().get_span_context()
+    if ctx.is_valid:
+        event_dict["trace_id"] = trace.format_trace_id(ctx.trace_id)
+        event_dict["span_id"] = trace.format_span_id(ctx.span_id)
+    return event_dict
+
+
+def add_otel_resource_to_structlog(
+    logger: WrappedLogger,
+    method_name: str,
+    event_dict: EventDict,
+) -> EventDict:
+    """Structlog processor injecting the OTel resource attributes into the log."""
+    merged: dict[str, Any] = {**_log_resource_attributes(), **event_dict}
+    return merged

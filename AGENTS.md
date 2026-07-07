@@ -16,7 +16,7 @@ This is a monorepo with two **independent** uv projects plus shared local-develo
 - `installer/` — Copier-templated validator installer scripts (`install.sh.jinja`,
   `update_compose.sh.jinja`, `README.md.jinja`); rendered by `copier copy` when adapting the template
 - `envs/deployed/` — Copier-templated production `docker-compose.yml.jinja` (validator + pylon);
-  the rendered repo is promoted on the `deploy-config-prod` branch, with this compose file and the
+  the rendered repo is promoted on the `deploy-config-production` branch, with this compose file and the
   installer scripts as the operator-critical files
 - `.github/workflows/` — Copier-templated CI; `build-validator.yml.jinja` builds and pushes the validator
   image to a registry on push to `deploy-build-*` branches
@@ -122,6 +122,19 @@ should ship with at least one event counter and one latency histogram, named
 consistently with the Nexus patterns you find there. If you expose a validator
 `/metrics` endpoint, add it into `envs/deployed/docker-compose.yml.jinja`
 scrape targets and update `installer/README.md.jinja`.
+
+#### Distributed tracing
+
+The validator emits OpenTelemetry traces, configured in `validator/src/validator/otel.py.jinja`
+(rendered to `otel.py`) and wired in from `main()` right after `configure_logging`. Resource
+attributes **deliberately carry no operator hotkey** — the observability proxy adds it downstream;
+the structlog processors in `logging_config.py` stamp the same attributes onto every log line so logs
+and traces correlate.
+
+In deployment the validator exports to a `grafana/alloy` sidecar that tail-samples and forwards to an
+OTLP/HTTP upstream (`envs/deployed/alloy/config.alloy.jinja`). **`TRACES_UPSTREAM_*` are required by
+the sidecar** — Alloy crash-loops on startup without an endpoint and credentials. `update_compose.sh`
+keeps both `docker-compose.yml` and `alloy/config.alloy` in sync on operator hosts.
 
 #### Structured logging
 

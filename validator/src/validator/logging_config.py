@@ -18,6 +18,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from structlog.processors import CallsiteParameterAdder
 from structlog.types import Processor
 
+from validator.otel import add_otel_context_to_structlog, add_otel_resource_to_structlog
+
 
 class LogFormat(enum.StrEnum):
     """Renderer selection for the validator's log output."""
@@ -48,6 +50,8 @@ _SHARED_PROCESSORS: Final[list[Processor]] = [
             structlog.processors.CallsiteParameter.LINENO,
         }
     ),
+    add_otel_resource_to_structlog,
+    add_otel_context_to_structlog,
 ]
 """Processors applied to both native structlog and foreign stdlib records."""
 

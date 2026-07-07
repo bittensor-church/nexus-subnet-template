@@ -4,7 +4,9 @@
 
 set -euo pipefail
 
-ENV_NAME="${1:-prod}"
+# ENV_NAME is both the deploy-config branch suffix (deploy-config-<ENV_NAME>) and the
+# OpenTelemetry deployment.environment.name attribute written to .env below.
+ENV_NAME="${1:-production}"
 WORKING_DIRECTORY=${2:-~/{{ working_dir_name }}/}
 
 mkdir -p "${WORKING_DIRECTORY}"
@@ -45,6 +47,11 @@ VALIDATOR_PYLON_OPEN_ACCESS_TOKEN=${VALIDATOR_PYLON_OPEN_ACCESS_TOKEN}
 PYLON_METRICS_TOKEN=${PYLON_METRICS_TOKEN}
 PROMETHEUS_PROXY_SECRET_KEY=${PROMETHEUS_PROXY_SECRET_KEY}
 SENTRY_DSN=${SENTRY_DSN}
+# Distributed traces upstream Alloy forwards to. Left empty because the `alloy` sidecar
+# ships disabled; required once it is enabled (Alloy crash-loops without them).
+TRACES_UPSTREAM_URL=
+TRACES_UPSTREAM_USER=
+TRACES_UPSTREAM_PASSWORD=
 EOL
 
     echo ".env file created successfully."
