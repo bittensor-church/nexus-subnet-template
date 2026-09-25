@@ -14,6 +14,7 @@ from nexus.v1 import (
     AsyncHttpNeuronCommunicator,
     NexusValidator,
     Port,
+    PylonClientSettingsMixin,
     RoundRobinNeuronRouter,
     miners_only,
 )
@@ -26,7 +27,7 @@ from validator.payload import PingInput, PingPayloadCreator, PongOutput
 from validator.response_logger import ErrorLoggerNode, ResponseLoggerNode
 
 
-class Settings(BaseSettings):
+class Settings(PylonClientSettingsMixin, BaseSettings):
     """Runtime configuration for the demo validator."""
 
     model_config = SettingsConfigDict(env_prefix="VALIDATOR_", extra="ignore")
