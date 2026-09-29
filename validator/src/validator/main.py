@@ -12,6 +12,7 @@ import click
 from dotenv import load_dotenv
 from nexus.v1 import (
     AsyncHttpNeuronCommunicator,
+    MechanismId,
     NexusValidator,
     Port,
     RoundRobinNeuronRouter,
@@ -32,6 +33,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="VALIDATOR_", extra="ignore")
 
     netuid: int = Field(validation_alias=AliasChoices("VALIDATOR_NETUID", "NETUID"))
+    mechanism_id: MechanismId = Field(default=MechanismId(0), ge=0, validation_alias="MECHANISM_ID")
     callback_host: str = "127.0.0.1"
     callback_port: int = 8001
     send_timeout: timedelta = timedelta(seconds=2)
