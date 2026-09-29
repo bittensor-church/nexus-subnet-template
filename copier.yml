@@ -48,6 +48,12 @@ default_netuid:
   help: "Default Bittensor netuid baked into the operator's .env."
   default: 1
 
+default_mechanism_id:
+  type: int
+  help: "Default Bittensor mechanism ID baked into the operator's .env."
+  default: 0
+  validator: "{% if default_mechanism_id < 0 %}Mechanism ID must be >= 0.{% endif %}"
+
 default_network:
   type: str
   help: "Default Bittensor network baked into the operator's .env."

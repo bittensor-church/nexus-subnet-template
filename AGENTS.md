@@ -96,6 +96,10 @@ Skip reading Nexus KB for higher level tasks that do not touch the code.
 
 ### Pylon
 
+Collect or honor `default_mechanism_id` during generation/design (default 0). When implementing
+weights, pass `Settings.mechanism_id` (`MECHANISM_ID`) to both `SetWeightsBeatNode`
+and `WeightSetterNode`.
+
 Sidecar subtensor communication proxy. Nexus uses Pylon for all subtensor (blockchain) communication. The pylon
 client's source code can be found and inspected in `validator/.venv`.
 

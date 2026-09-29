@@ -32,12 +32,14 @@ if [ ! -f "${ENV_FILE}" ]; then
     PYLON_METRICS_TOKEN=$(openssl rand -hex 32)
     PROMETHEUS_PROXY_SECRET_KEY=$(openssl rand -hex 32)
     NETUID={{ default_netuid }}
+    MECHANISM_ID={{ default_mechanism_id }}
 
     read -r -p "Enter SENTRY_DSN (optional, press Enter to skip): " SENTRY_DSN </dev/tty
     SENTRY_DSN=${SENTRY_DSN:-}
 
     cat > "${ENV_FILE}" << EOL
 NETUID=${NETUID}
+MECHANISM_ID=${MECHANISM_ID}
 BITTENSOR_NETWORK=${BITTENSOR_NETWORK}
 BITTENSOR_WALLET_NAME=${BITTENSOR_WALLET_NAME}
 BITTENSOR_WALLET_HOTKEY_NAME=${BITTENSOR_WALLET_HOTKEY_NAME}

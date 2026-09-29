@@ -66,7 +66,7 @@ uv run --with copier copier copy gh:bittensor-church/nexus-subnet-template ../<n
 ```
 
 Copier will prompt for the values defined in `copier.yml` (`subnet_name`,
-`github_org`, `github_repo`, `default_netuid`, `default_network`, …).
+`github_org`, `github_repo`, `default_netuid`, `default_mechanism_id`, `default_network`, …).
 
 After a successful fresh-directory render:
 
