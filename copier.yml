@@ -1,5 +1,6 @@
 _subdirectory: .
 _templates_suffix: .jinja
+_preserve_symlinks: true
 _envops:
   trim_blocks: true
   lstrip_blocks: true
