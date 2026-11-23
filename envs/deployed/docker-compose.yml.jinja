@@ -1,22 +1,26 @@
 services:
   pylon:
-    # backenddevelopersltd/bittensor-pylon:2.0.0 - bump via knowledge/validator.deploy.md (Procedure 3).
-    image: backenddevelopersltd/bittensor-pylon@sha256:5e614a173c0cba3b33fbd15436105b362050bff876018e6bfd2dc6afee187acf
+    # backenddevelopersltd/bittensor-pylon:2.3.4 - bump via knowledge/validator.deploy.md (Procedure 3).
+    image: backenddevelopersltd/bittensor-pylon@sha256:2e7a3470b1ff6f4a72f53a075c1f215cd352a0d289387bad10f328825f396dbb
     restart: unless-stopped
     env_file: ./.env
     environment:
       PYLON_BITTENSOR_NETWORK: "${BITTENSOR_NETWORK:?}"
+      # Serves queries older than ~300 blocks; Pylon defaults it to the finney archive.
+      PYLON_BITTENSOR_ARCHIVE_NETWORK: "${BITTENSOR_ARCHIVE_NETWORK:?}"
       PYLON_OPEN_ACCESS_TOKEN: "${VALIDATOR_PYLON_OPEN_ACCESS_TOKEN:?}"
       PYLON_IDENTITIES: '["validator"]'
       PYLON_BITTENSOR_WALLET_PATH: "/wallets"
-      PYLON_TEMPO: "360"
+      # Keeps Pylon's weight-submission tasks across container recreation.
+      PYLON_DATABASE_PATH: "/data/pylon.db"
       PYLON_ID_VALIDATOR_WALLET_NAME: "${BITTENSOR_WALLET_NAME:?}"
       PYLON_ID_VALIDATOR_HOTKEY_NAME: "${BITTENSOR_WALLET_HOTKEY_NAME:?}"
       PYLON_ID_VALIDATOR_NETUID: "${NETUID:?}"
-      PYLON_ID_VALIDATOR_TOKEN: "${VALIDATOR_PYLON_OPEN_ACCESS_TOKEN:?}"
+      PYLON_ID_VALIDATOR_TOKEN: "${VALIDATOR_PYLON_IDENTITY_TOKEN:?}"
       PYLON_METRICS_TOKEN: "${PYLON_METRICS_TOKEN:?}"
     volumes:
       - "${HOST_WALLET_DIR:?}:/wallets:ro"
+      - pylon-data:/data
 
   validator:
     # Replaced with a real digest on first promotion - see knowledge/validator.deploy.md (Procedure 2).
@@ -25,6 +29,9 @@ services:
     env_file: ./.env
     environment:
       VALIDATOR_PYLON_SERVICE_ADDRESS: "http://pylon:8000"
+      # Signs chain writes (weights, commitments) as the `validator` Pylon identity.
+      VALIDATOR_PYLON_IDENTITY_NAME: "validator"
+      VALIDATOR_PYLON_IDENTITY_TOKEN: "${VALIDATOR_PYLON_IDENTITY_TOKEN:?}"
       # Traces OFF: the `alloy` sidecar is commented out below, so SDK_DISABLED
       # stops the validator from exporting to a non-existent collector. Drop this
       # line when re-enabling the `alloy` service.
@@ -143,5 +150,6 @@ services:
     volumes:
       - "${HOST_WALLET_DIR:?}:/root/.bittensor/wallets"
 
-# volumes:
-#   alloy-data: {}  # uncomment together with the `alloy` service above
+volumes:
+  pylon-data: {}
+  # alloy-data: {}  # uncomment together with the `alloy` service above
