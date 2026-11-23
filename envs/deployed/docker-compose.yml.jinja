@@ -88,10 +88,20 @@ services:
     pid: host
     volumes:
       - /:/host:ro,rslave
-    command:
-      - '--path.rootfs=/host'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc|run|boot|var/.+)($$|/)'
-      - '--collector.tcpstat'
+    # The host network makes network metrics describe the host's interfaces rather than a
+    # container's. Listen only on the Docker bridge address that `host.docker.internal:host-gateway`
+    # resolves to, so host metrics are not served on public interfaces.
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        address=$$(ip -4 -o addr show docker0 | awk '{split($$4, a, "/"); print a[1]; exit}')
+        [ -n "$$address" ] || { echo "docker0 has no IPv4 address" >&2; exit 1; }
+        exec /bin/node_exporter \
+          --web.listen-address="$$address:9100" \
+          --path.rootfs=/host \
+          '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc|run|boot|var/.+)($$|/)' \
+          --collector.tcpstat
 
   prometheus:
     image: backenddevelopersltd/bittensor_prometheus:latest

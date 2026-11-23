@@ -49,12 +49,14 @@ semver.
 
 ## The traces sidecar (Alloy)
 
-`envs/deployed/docker-compose.yml` runs a `grafana/alloy` sidecar that tail-samples the
-validator's OpenTelemetry spans and forwards them to an OTLP/HTTP upstream. Its config lives
-next to the compose file in `envs/deployed/alloy/config.alloy` and is synced to operator hosts
-by the same `update_compose.sh` cron job (it now fetches both files). **`TRACES_UPSTREAM_URL` /
-`TRACES_UPSTREAM_USER` / `TRACES_UPSTREAM_PASSWORD` are required by the sidecar** — Alloy
-refuses to build its exporter without an endpoint and credentials, so with any of them
+The `grafana/alloy` sidecar in `envs/deployed/docker-compose.yml` ships **commented out**, and
+the validator runs with `VALIDATOR_OTEL_SDK_DISABLED=true`, so no traces are exported today.
+Once enabled, it tail-samples the validator's OpenTelemetry spans and forwards them to an
+OTLP/HTTP upstream. Its config lives next to the compose file in `envs/deployed/alloy/config.alloy`
+and is already synced to operator hosts by the same `update_compose.sh` cron job. Enabling it
+means uncommenting the service and its `alloy-data` volume, filling `TRACES_UPSTREAM_URL` /
+`TRACES_UPSTREAM_USER` / `TRACES_UPSTREAM_PASSWORD` and dropping `VALIDATOR_OTEL_SDK_DISABLED`:
+Alloy refuses to build its exporter without an endpoint and credentials, so with any of them
 empty the sidecar crash-loops on startup. Bumping the Alloy image or editing the Alloy
 config is a Procedure 3 change (non-validator service) and ships on `deploy-config-<env>`.
 
