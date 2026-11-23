@@ -55,7 +55,8 @@ services:
   #       the validator. The Alloy config lives in envs/deployed/alloy/config.alloy.
   #
   # alloy:
-  #   image: grafana/alloy:v1.15.1
+  #   # grafana/alloy:v1.21.3
+  #   image: grafana/alloy@sha256:8ab871206bd2d8f89277f53abffee5f452a293980788d52f85fa183a87a505a4
   #   restart: unless-stopped
   #   environment:
   #     TRACES_UPSTREAM_URL: "${TRACES_UPSTREAM_URL:-}"
@@ -70,7 +71,8 @@ services:
   #     - /etc/alloy/config.alloy
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.40.0
+    # ghcr.io/google/cadvisor:v0.61.1
+    image: ghcr.io/google/cadvisor@sha256:4929b70e82079d001d0028b85d6a4dd25ad4666b719455c9542b983489963916
     restart: unless-stopped
     devices:
       - /dev/kmsg:/dev/kmsg
@@ -82,7 +84,8 @@ services:
       - /cgroup:/cgroup:ro
 
   node-exporter:
-    image: prom/node-exporter:latest
+    # prom/node-exporter:v1.13.1
+    image: prom/node-exporter@sha256:7296504d4ada44b7d7ab4431e27e9f9900d8488f8d55842f4b12ae2704e16dfe
     restart: unless-stopped
     network_mode: host
     pid: host
@@ -94,7 +97,8 @@ services:
       - '--collector.tcpstat'
 
   prometheus:
-    image: backenddevelopersltd/bittensor_prometheus:latest
+    # backenddevelopersltd/bittensor_prometheus:1.0.3
+    image: backenddevelopersltd/bittensor_prometheus@sha256:35112f61ffdeb2627f6626ad5ce6cabf0d1598e63f6758cd0b81cd28b494767a
     restart: unless-stopped
     env_file: ./.env
     depends_on:
@@ -131,7 +135,9 @@ services:
       exec /entrypoint.sh --log.level=debug --storage.tsdb.retention.size=1GB'
 
   prometheus-proxy:
-    image: backenddevelopersltd/bittensor-prometheus-proxy:latest
+    # backenddevelopersltd/bittensor-prometheus-proxy:9a0003f (= latest, Aug 2025). Its CA store and certifi
+    # still trust the distrusted emSign roots; bump once a rebuilt image is published.
+    image: backenddevelopersltd/bittensor-prometheus-proxy@sha256:324cb33e57c27a716507e05a55b507756d047bd4959243f04efb4b2683a41b13
     restart: unless-stopped
     environment:
       CENTRAL_PROMETHEUS_PROXY_URL: "https://prometheus.bactensor.io"

@@ -24,6 +24,9 @@ build-backend = "hatchling.build"
 only-include = ["miner.py"]
 
 [tool.uv]
+# CA trust floors after the emSign distrust (Oct 2026): uv's bundled roots and certifi.
+required-version = ">=0.13.4"
+constraint-dependencies = ["certifi>=2026.10.19"]
 exclude-newer = "1 week"
 
 [dependency-groups]

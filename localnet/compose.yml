@@ -1,6 +1,7 @@
 services:
   subtensor:
-    image: ghcr.io/opentensor/subtensor-localnet:devnet-ready
+    # ghcr.io/raofoundation/subtensor-localnet:v486 (opentensor's devnet-ready stopped updating in July 2026)
+    image: ghcr.io/raofoundation/subtensor-localnet@sha256:597778ceb7de7e39e60545a7e5f18829ca1530d8e5be7e097c17cf404e742ff0
     ports:
       - "9944:9944"
       - "9933:9933"
