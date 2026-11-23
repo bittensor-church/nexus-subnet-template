@@ -62,8 +62,8 @@ wheels = [
 
 [[package]]
 name = "bittensor-nexus-library"
-version = "0.0.1.dev184+gd54e268af"
-source = { git = "https://github.com/bittensor-church/bittensor-nexus-library.git#d54e268af8529f3329ae67562e926c74cd685b71" }
+version = "0.0.1.dev185+g56b238fcf"
+source = { git = "https://github.com/bittensor-church/bittensor-nexus-library.git#56b238fcfb457d80d64dc394a8bc48e2f3085098" }
 dependencies = [
     { name = "bittensor-pylon-client" },
     { name = "boto3" },
