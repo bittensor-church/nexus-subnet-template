@@ -22,7 +22,7 @@ Lightweight, isolated development environment modeling a toy subnet for rapid pr
 ## Resources
 
 - **bootstrap.py** — creates owner and validator wallets, sets tempo, disables commit-reveal, registers subnet,
-  registers, and stakes validator
+  enables the `MECHANISM_ID` mechanism, registers, and stakes validator; dependencies locked in `bootstrap.py.lock`
 - **miners/miner.template.py** — not runnable; copy to miner-{profile}.py and customize per subnet's needs.
   Distinct from the production miner in `/miner` (separate uv project) — these are localnet-only profile
   simulators
@@ -56,6 +56,8 @@ out.
   set in localnet/.env, probably 360 but check
 - **netuid:** netuid 1 reserved and unusable; bootstrap attempts to register netuid 2
 - **owner UID:** subnet owner is automatically uid 0
+- **mechanisms:** new subnets have only mechanism 0; under Yuma, MaxAllowedUids × mechanism count must stay ≤ 256,
+  so bootstrap lowers MaxAllowedUids before adding mechanisms; Sudo reports success even when the inner call fails
 - **activation:** subnet inactive until start_call (after get_start_call_delay().value blocks); bootstrap does this
 - **funding:** no faucet — transfer from Alice (//Alice)
 - **axon IP:** 127.0.0.1 silently rejected by subtensor; use 127.0.0.2

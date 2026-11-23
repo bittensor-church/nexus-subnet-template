@@ -1,12 +1,16 @@
 # /// script
 # requires-python = ">=3.14"
 # dependencies = [
-#     "bittensor",
+#     "bittensor>=10.3,<11",
 #     "bittensor-wallet",
 #     "litestar[standard]",
 #     "httpx",
 #     "click",
 # ]
+#
+# [tool.uv]
+# # Avoid pulling in freshly published, possibly compromised dependencies.
+# exclude-newer = "11 days"
 # ///
 """
 Localnet miner fixture template.
