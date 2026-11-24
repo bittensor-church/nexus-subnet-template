@@ -62,7 +62,8 @@ services:
   #       the validator. The Alloy config lives in envs/deployed/alloy/config.alloy.
   #
   # alloy:
-  #   image: grafana/alloy:v1.15.1
+  #   # grafana/alloy:v1.21.3
+  #   image: grafana/alloy@sha256:8ab871206bd2d8f89277f53abffee5f452a293980788d52f85fa183a87a505a4
   #   restart: unless-stopped
   #   environment:
   #     TRACES_UPSTREAM_URL: "${TRACES_UPSTREAM_URL:-}"
@@ -77,7 +78,8 @@ services:
   #     - /etc/alloy/config.alloy
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.40.0
+    # ghcr.io/google/cadvisor:v0.61.1
+    image: ghcr.io/google/cadvisor@sha256:4929b70e82079d001d0028b85d6a4dd25ad4666b719455c9542b983489963916
     restart: unless-stopped
     devices:
       - /dev/kmsg:/dev/kmsg
@@ -89,7 +91,8 @@ services:
       - /cgroup:/cgroup:ro
 
   node-exporter:
-    image: prom/node-exporter:latest
+    # prom/node-exporter:v1.13.1
+    image: prom/node-exporter@sha256:7296504d4ada44b7d7ab4431e27e9f9900d8488f8d55842f4b12ae2704e16dfe
     restart: unless-stopped
     network_mode: host
     pid: host
@@ -101,7 +104,8 @@ services:
       - '--collector.tcpstat'
 
   prometheus:
-    image: backenddevelopersltd/bittensor_prometheus:latest
+    # backenddevelopersltd/bittensor_prometheus:1.0.3
+    image: backenddevelopersltd/bittensor_prometheus@sha256:35112f61ffdeb2627f6626ad5ce6cabf0d1598e63f6758cd0b81cd28b494767a
     restart: unless-stopped
     env_file: ./.env
     depends_on:
@@ -133,17 +137,20 @@ services:
             type: Bearer
             credentials: $${PYLON_METRICS_TOKEN}
       remote_write:
-        - url: "http://prometheus-proxy:8000/prometheus_outbound_proxy/"
+        - url: "http://prometheus-proxy:8000/prometheus/outbound"
       EOF
       exec /entrypoint.sh --log.level=debug --storage.tsdb.retention.size=1GB'
 
   prometheus-proxy:
-    image: backenddevelopersltd/bittensor-prometheus-proxy:latest
+    # 1.0.3 rejects the compromised eMudhra intermediates (ca-certificates 20250419+deb13u1, certifi 2026.10.19).
+    # Pin a stable tag: GHCR `latest` can point at a prerelease.
+    image: ghcr.io/bittensor-church/bittensor-prometheus-proxy:1.0.3@sha256:39caeb310b1b29baef8e7794157fa66953e0e610e9bd712589bb84bf7cff2286
     restart: unless-stopped
     environment:
       CENTRAL_PROMETHEUS_PROXY_URL: "https://prometheus.bactensor.io"
       ENV: "prometheus-proxy-prod"
       SECRET_KEY: "${PROMETHEUS_PROXY_SECRET_KEY:?}"
+      BITTENSOR_NETUID: "${NETUID:?}"
       BITTENSOR_WALLET_NAME: "${BITTENSOR_WALLET_NAME:?}"
       BITTENSOR_WALLET_HOTKEY_NAME: "${BITTENSOR_WALLET_HOTKEY_NAME:?}"
       SENTRY_DSN: "${SENTRY_DSN:-}"

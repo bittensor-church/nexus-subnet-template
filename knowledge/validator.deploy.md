@@ -40,12 +40,11 @@ third-party image in the stack (pylon, anything else). There is no "but this
 tag is semver, so it's safe" exception — the registry doesn't care about
 semver.
 
-> Observability sidecars currently ship pinned only by tag (`cadvisor:v0.40.0`,
-> `node-exporter:latest`, `bittensor_prometheus:latest`, `grafana/alloy:v1.15.1`)
-> rather than by digest. This is a known gap, not an endorsement: when hardening
-> the deploy, pin these by `@sha256` too via Procedure 3. The `alloy` traces
-> sidecar (see the tracing notes below) follows the same convention as the rest
-> of the metrics stack for now.
+> The same rule covers the build inputs: the validator `Dockerfile` pins its
+> Python and uv images by digest, the CI workflow pins its actions by commit SHA
+> and its BuildKit image by digest, and `localnet/compose.yml` pins its images.
+> Each pin carries a comment with the tag it was resolved from, so a bump is a
+> visible tag-and-digest change.
 
 ## The traces sidecar (Alloy)
 

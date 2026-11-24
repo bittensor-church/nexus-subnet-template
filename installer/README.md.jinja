@@ -50,7 +50,7 @@ On first run the installer asks for:
 
 Written to `<WORKING_DIRECTORY>/.env` on first run:
 
-- `NETUID` — subnet netuid (default: `{{ default_netuid }}`).
+- `NETUID` — subnet netuid (default: `{{ default_netuid }}`). The `prometheus-proxy` sidecar signs metrics with it; `https://prometheus.bactensor.io` only accepts netuids on its allow-list.
 - `MECHANISM_ID` — weight mechanism ID (default: `{{ default_mechanism_id }}`).
 - `BITTENSOR_NETWORK` — Bittensor network address (e.g. `finney`, `ws://localhost:9944`).
 - `BITTENSOR_ARCHIVE_NETWORK` — archive node Pylon uses for blocks older than its cutoff (`archive` for `finney`).
