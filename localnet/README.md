@@ -49,7 +49,9 @@ Starts a local subtensor blockchain (port 9944) and a pylon proxy (port 8000).
 uv run localnet/bootstrap.py
 ```
 
-Creates owner and validator wallets, funds them from Alice (pre-funded devnet account), creates subnet (netuid 2), and registers + stakes the validator. Idempotent — safe to re-run.
+Creates owner and validator wallets, funds them from Alice (pre-funded devnet account), creates subnet (netuid 2), enables the weight mechanism set by `MECHANISM_ID`, and registers + stakes the validator. Idempotent — safe to re-run.
+
+The script's dependencies are locked in `bootstrap.py.lock`; refresh them with `uv lock --script localnet/bootstrap.py`.
 
 ## Running the validator
 
@@ -82,6 +84,7 @@ Copy the template and customize:
 
 ```sh
 cp localnet/miners/miner.template.py localnet/miners/miner-yourname.py
+cp localnet/miners/miner.template.py.lock localnet/miners/miner-yourname.py.lock
 # edit MINER_NAME, TARGET_PATH, run_task(), anything else necessary for the subnet
 ```
 

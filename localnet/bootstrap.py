@@ -1,10 +1,14 @@
 # /// script
 # requires-python = ">=3.14"
 # dependencies = [
-#     "bittensor",
+#     "bittensor>=10.3,<11",
 #     "bittensor-wallet",
 #     "python-dotenv",
 # ]
+#
+# [tool.uv]
+# # Avoid pulling in freshly published, possibly compromised dependencies.
+# exclude-newer = "11 days"
 # ///
 """
 Localnet bootstrap script.
@@ -12,6 +16,7 @@ Localnet bootstrap script.
 Sets up the local subnet infrastructure:
 - Transfers TAO from Alice (pre-funded devnet account) to owner and validator wallets
 - Creates and activates subnet (netuid 2, since netuid 1 is owned by zero-key and is unusable)
+- Enables the weight mechanism selected by MECHANISM_ID
 - Registers and stakes validator neuron
 
 register_subnet has no netuid parameter — the chain auto-assigns the next free slot. We
@@ -45,6 +50,10 @@ FUND_AMOUNT_TAO = 10_000.0
 
 EXPECTED_NETUID = int(os.environ["NETUID"])
 SUBNET_TEMPO = int(os.environ["SUBNET_TEMPO"])
+MECHANISM_ID = int(os.environ["MECHANISM_ID"])
+
+# Under Yuma consensus the runtime requires MaxAllowedUids * mechanism_count <= 256.
+EPOCH_UID_BUDGET = 256
 
 # Disabled until we have support for fast blocks in pylon
 SUBNET_COMMIT_REVEAL_ENABLED = False
@@ -293,18 +302,19 @@ def register_neuron(subtensor: bt.Subtensor, wallet: Wallet, netuid: int) -> Non
 
 
 def stake_validator(subtensor: bt.Subtensor, wallet: Wallet, netuid: int) -> None:
-    """Ensure the validator has the target localnet stake."""
+    """Stake VALIDATOR_STAKE_TAO for the validator once."""
     current_stake = subtensor.get_stake(
         coldkey_ss58=wallet.coldkey.ss58_address,
         hotkey_ss58=wallet.hotkey.ss58_address,
         netuid=netuid,
     )
-    target_stake = Balance.from_tao(VALIDATOR_STAKE_TAO, netuid=netuid)
-    if current_stake >= target_stake:
+    # Stake is denominated in alpha, whose price moves, so it never matches the TAO amount.
+    # Any existing stake counts as done; re-runs must not keep spending TAO.
+    if current_stake > Balance.from_tao(0, netuid=netuid):
         print(f"  {wallet.name} already staked (stake: {current_stake})")
         return
 
-    amount_to_add = Balance.from_tao(target_stake.tao - current_stake.tao)
+    amount_to_add = Balance.from_tao(VALIDATOR_STAKE_TAO)
     print(f"  Staking {amount_to_add} for {wallet.name}...")
     response = subtensor.add_stake(
         wallet=wallet,
@@ -319,6 +329,41 @@ def stake_validator(subtensor: bt.Subtensor, wallet: Wallet, netuid: int) -> Non
         print(f"  Staking failed: {response.message}")
         sys.exit(1)
     print(f"  {wallet.name} staked")
+
+
+def sudo_admin_call(subtensor: bt.Subtensor, sudo: Wallet, function: str, params: dict[str, int]) -> None:
+    """Dispatch an AdminUtils call through Sudo; callers must verify the resulting state."""
+    inner = subtensor.compose_call(call_module="AdminUtils", call_function=function, call_params=params)
+    response = subtensor.sign_and_send_extrinsic(
+        call=Sudo(subtensor).sudo(inner),
+        wallet=sudo,
+        wait_for_inclusion=True,
+        wait_for_finalization=True,
+    )
+    if not response.success:
+        print(f"  {function} failed: {response.message}")
+        sys.exit(1)
+
+
+def ensure_mechanism(subtensor: bt.Subtensor, sudo: Wallet, netuid: int, mechanism_id: int) -> None:
+    """Make sure the subnet has mechanism `mechanism_id`. Requires the root key. Idempotent."""
+    count = subtensor.get_mechanism_count(netuid)
+    required = mechanism_id + 1
+    if count >= required:
+        print(f"  mechanism count already {count}")
+        return
+    max_uids = EPOCH_UID_BUDGET // required
+    if int(subtensor.get_hyperparameter("MaxAllowedUids", netuid=netuid)) > max_uids:
+        print(f"  Lowering max allowed UIDs to {max_uids} so {required} mechanisms fit...")
+        sudo_admin_call(subtensor, sudo, "sudo_set_max_allowed_uids", {"netuid": netuid, "max_allowed_uids": max_uids})
+    print(f"  Setting mechanism count {count} -> {required} via sudo...")
+    sudo_admin_call(subtensor, sudo, "sudo_set_mechanism_count", {"netuid": netuid, "mechanism_count": required})
+    # Sudo reports success even when the inner call fails, so verify state.
+    new_count = subtensor.get_mechanism_count(netuid)
+    if new_count < required:
+        print(f"  set_mechanism_count failed: on-chain value is {new_count}, expected {required}")
+        sys.exit(1)
+    print(f"  mechanism count set to {new_count}")
 
 
 def main() -> None:
@@ -342,6 +387,7 @@ def main() -> None:
     print("\n--- Configuring subnet hyperparameters ---")
     set_subnet_tempo(subtensor, alice, netuid, SUBNET_TEMPO)
     set_commit_reveal_enabled(subtensor, owner, netuid, SUBNET_COMMIT_REVEAL_ENABLED)
+    ensure_mechanism(subtensor, alice, netuid, MECHANISM_ID)
 
     print("\n--- Activating subnet ---")
     activate_subnet(subtensor, owner, netuid)
