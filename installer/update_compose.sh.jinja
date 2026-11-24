@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Pulls the latest envs/deployed/docker-compose.yml and the Alloy traces config
-# from the deploy-config-${ENV_NAME} branch and restarts the {{ subnet_name }}
+# Pulls envs/deployed/docker-compose.yml and the Alloy traces config from one
+# revision of the deploy-config-${ENV_NAME} branch and restarts the {{ subnet_name }}
 # validator stack if anything changed.
 
 set -euo pipefail
@@ -14,12 +14,42 @@ mkdir -p "${WORKING_DIRECTORY}"
 cd "${WORKING_DIRECTORY}"
 
 ENV_FILE="${WORKING_DIRECTORY}/.env"
-if [ -f "${ENV_FILE}" ] && ! grep -q '^ENVIRONMENT=' "${ENV_FILE}"; then
-    echo "ENVIRONMENT=${ENV_NAME}" >> "${ENV_FILE}"
+# Backfill settings that installations created by older installers lack.
+if [ -f "${ENV_FILE}" ]; then
+    # Terminate a manually edited last line so the appends below don't join it.
+    if [ -n "$(tail -c 1 "${ENV_FILE}")" ]; then
+        echo >> "${ENV_FILE}"
+    fi
+    if ! grep -q '^ENVIRONMENT=' "${ENV_FILE}"; then
+        echo "ENVIRONMENT=${ENV_NAME}" >> "${ENV_FILE}"
+    fi
+    if ! grep -q '^VALIDATOR_PYLON_IDENTITY_TOKEN=' "${ENV_FILE}"; then
+        echo "VALIDATOR_PYLON_IDENTITY_TOKEN=$(openssl rand -hex 32)" >> "${ENV_FILE}"
+    fi
+    if ! grep -q '^BITTENSOR_ARCHIVE_NETWORK=' "${ENV_FILE}"; then
+        NETWORK="$(sed -n 's/^BITTENSOR_NETWORK=//p' "${ENV_FILE}" | tail -n 1)"
+        if [ "${NETWORK}" = "finney" ]; then
+            echo "BITTENSOR_ARCHIVE_NETWORK=archive" >> "${ENV_FILE}"
+        else
+            echo "BITTENSOR_ARCHIVE_NETWORK=${NETWORK}" >> "${ENV_FILE}"
+        fi
+    fi
 fi
 
-GITHUB_URL="https://raw.githubusercontent.com/{{ github_org }}/{{ github_repo }}/refs/heads"
-BRANCH_URL="${GITHUB_URL}/deploy-config-${ENV_NAME}"
+# Resolve the branch to one commit so every file comes from the same revision;
+# raw.githubusercontent.com caches branch paths per file.
+BRANCH="deploy-config-${ENV_NAME}"
+if ! REVISION="$(curl -fsSL -H "Accept: application/vnd.github.sha" \
+    "https://api.github.com/repos/{{ github_org }}/{{ github_repo }}/commits/${BRANCH}")"; then
+    echo "Error: failed to resolve ${BRANCH}. Aborting update."
+    exit 1
+fi
+if ! [[ "${REVISION}" =~ ^[0-9a-f]{40}$ ]]; then
+    echo "Error: unexpected revision for ${BRANCH}: ${REVISION}. Aborting update."
+    exit 1
+fi
+echo "Using ${BRANCH} at ${REVISION}"
+BRANCH_URL="https://raw.githubusercontent.com/{{ github_org }}/{{ github_repo }}/${REVISION}"
 
 UPDATED=false
 

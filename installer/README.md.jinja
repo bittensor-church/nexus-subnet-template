@@ -40,6 +40,7 @@ This will:
 On first run the installer asks for:
 
 - `BITTENSOR_NETWORK` (default `{{ default_network }}`)
+- `BITTENSOR_ARCHIVE_NETWORK` (default `archive` for `finney`, otherwise the same as `BITTENSOR_NETWORK`)
 - `HOST_WALLET_DIR` (default `~/.bittensor/wallets`)
 - `BITTENSOR_WALLET_NAME` (default `validator`)
 - `BITTENSOR_WALLET_HOTKEY_NAME` (default `default`)
@@ -52,11 +53,14 @@ Written to `<WORKING_DIRECTORY>/.env` on first run:
 - `NETUID` — subnet netuid (default: `{{ default_netuid }}`).
 - `MECHANISM_ID` — weight mechanism ID (default: `{{ default_mechanism_id }}`).
 - `BITTENSOR_NETWORK` — Bittensor network address (e.g. `finney`, `ws://localhost:9944`).
+- `BITTENSOR_ARCHIVE_NETWORK` — archive node Pylon uses for blocks older than its cutoff (`archive` for `finney`).
 - `BITTENSOR_WALLET_NAME` / `BITTENSOR_WALLET_HOTKEY_NAME` — wallet identifiers consumed by pylon.
 - `HOST_WALLET_DIR` — host-side path to the Bittensor wallets directory (mounted read-only into pylon).
 - `ENVIRONMENT` — OpenTelemetry `deployment.environment.name` resource attribute stamped on traces and
   logs (default: `production`).
-- `VALIDATOR_PYLON_OPEN_ACCESS_TOKEN` — auto-generated 32-byte hex token shared between validator and pylon.
+- `VALIDATOR_PYLON_OPEN_ACCESS_TOKEN` — auto-generated 32-byte hex token for pylon's read-only open-access API.
+- `VALIDATOR_PYLON_IDENTITY_TOKEN` — auto-generated 32-byte hex token for pylon's `validator` identity, which signs
+  chain writes such as weights. Kept separate so the open-access token can be shared with read-only consumers.
 - `PYLON_METRICS_TOKEN` — auto-generated 32-byte hex Bearer token used by the local Prometheus to scrape Pylon's `/metrics` endpoint.
 - `PROMETHEUS_PROXY_SECRET_KEY` — auto-generated 32-byte hex signing key for the `bittensor-prometheus-proxy` sidecar that remote-writes metrics to `https://prometheus.bactensor.io`.
 - `SENTRY_DSN` — optional Sentry DSN for the `prometheus-proxy` sidecar; leave empty to disable error reporting.
@@ -83,6 +87,9 @@ curl -s https://raw.githubusercontent.com/{{ github_org }}/{{ github_repo }}/ref
 ## Updates
 
 The validator updates itself automatically every 15 minutes via the cron job installed by the installer script.
+Each run resolves `deploy-config-<ENV_NAME>` to one commit through the GitHub API and fetches every file from it.
+It also adds settings introduced after the installation was created (`VALIDATOR_PYLON_IDENTITY_TOKEN`,
+`BITTENSOR_ARCHIVE_NETWORK`) to `.env`.
 
 ## Manual Update
 

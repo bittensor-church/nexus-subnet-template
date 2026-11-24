@@ -11,15 +11,19 @@ services:
       retries: 10
 
   pylon:
-    image: backenddevelopersltd/bittensor-pylon:2.1.0
+    # backenddevelopersltd/bittensor-pylon:2.3.4 - keep in sync with envs/deployed/docker-compose.yml
+    image: backenddevelopersltd/bittensor-pylon@sha256:2e7a3470b1ff6f4a72f53a075c1f215cd352a0d289387bad10f328825f396dbb
     ports:
       - "8000:8000"
     environment:
       PYLON_BITTENSOR_NETWORK: "ws://subtensor:9944"
+      PYLON_BITTENSOR_ARCHIVE_NETWORK: "ws://subtensor:9944"
+      # Without these Pylon talks to mainnet's EVM endpoints.
+      PYLON_EVM_RPC_URL: "http://subtensor:9944"
+      PYLON_EVM_ARCHIVE_RPC_URL: "http://subtensor:9944"
       PYLON_OPEN_ACCESS_TOKEN: "${VALIDATOR_PYLON_OPEN_ACCESS_TOKEN:?}"
       PYLON_IDENTITIES: '["${VALIDATOR_PYLON_IDENTITY_NAME:?}"]'
       PYLON_BITTENSOR_WALLET_PATH: "/wallets"
-      PYLON_TEMPO: "${SUBNET_TEMPO:?}"
       # Identity: maps identity name to the validator wallet created by bootstrap
       PYLON_ID_VALIDATOR_WALLET_NAME: "${VALIDATOR_PYLON_IDENTITY_NAME:?}"
       PYLON_ID_VALIDATOR_HOTKEY_NAME: "default"

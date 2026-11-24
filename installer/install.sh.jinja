@@ -19,6 +19,15 @@ if [ ! -f "${ENV_FILE}" ]; then
     read -r -p "Enter BITTENSOR_NETWORK [{{ default_network }}]: " BITTENSOR_NETWORK </dev/tty
     BITTENSOR_NETWORK=${BITTENSOR_NETWORK:-{{ default_network }}}
 
+    # Pylon serves old blocks from the archive network; finney's is "archive".
+    if [ "${BITTENSOR_NETWORK}" = "finney" ]; then
+        DEFAULT_ARCHIVE_NETWORK=archive
+    else
+        DEFAULT_ARCHIVE_NETWORK=${BITTENSOR_NETWORK}
+    fi
+    read -r -p "Enter BITTENSOR_ARCHIVE_NETWORK [${DEFAULT_ARCHIVE_NETWORK}]: " BITTENSOR_ARCHIVE_NETWORK </dev/tty
+    BITTENSOR_ARCHIVE_NETWORK=${BITTENSOR_ARCHIVE_NETWORK:-${DEFAULT_ARCHIVE_NETWORK}}
+
     read -r -p "Enter HOST_WALLET_DIR [~/.bittensor/wallets]: " HOST_WALLET_DIR </dev/tty
     HOST_WALLET_DIR=${HOST_WALLET_DIR:-~/.bittensor/wallets}
 
@@ -29,6 +38,7 @@ if [ ! -f "${ENV_FILE}" ]; then
     BITTENSOR_WALLET_HOTKEY_NAME=${BITTENSOR_WALLET_HOTKEY_NAME:-default}
 
     VALIDATOR_PYLON_OPEN_ACCESS_TOKEN=$(openssl rand -hex 32)
+    VALIDATOR_PYLON_IDENTITY_TOKEN=$(openssl rand -hex 32)
     PYLON_METRICS_TOKEN=$(openssl rand -hex 32)
     PROMETHEUS_PROXY_SECRET_KEY=$(openssl rand -hex 32)
     NETUID={{ default_netuid }}
@@ -41,15 +51,17 @@ if [ ! -f "${ENV_FILE}" ]; then
 NETUID=${NETUID}
 MECHANISM_ID=${MECHANISM_ID}
 BITTENSOR_NETWORK=${BITTENSOR_NETWORK}
+BITTENSOR_ARCHIVE_NETWORK=${BITTENSOR_ARCHIVE_NETWORK}
 BITTENSOR_WALLET_NAME=${BITTENSOR_WALLET_NAME}
 BITTENSOR_WALLET_HOTKEY_NAME=${BITTENSOR_WALLET_HOTKEY_NAME}
 HOST_WALLET_DIR=${HOST_WALLET_DIR}
 ENVIRONMENT=${ENV_NAME}
 VALIDATOR_PYLON_OPEN_ACCESS_TOKEN=${VALIDATOR_PYLON_OPEN_ACCESS_TOKEN}
+VALIDATOR_PYLON_IDENTITY_TOKEN=${VALIDATOR_PYLON_IDENTITY_TOKEN}
 PYLON_METRICS_TOKEN=${PYLON_METRICS_TOKEN}
 PROMETHEUS_PROXY_SECRET_KEY=${PROMETHEUS_PROXY_SECRET_KEY}
 SENTRY_DSN=${SENTRY_DSN}
-# Distributed traces upstream Alloy forwards to. Left empty because the `alloy` sidecar
+# Distributed traces upstream Alloy forwards to. Left empty because the alloy sidecar
 # ships disabled; required once it is enabled (Alloy crash-loops without them).
 TRACES_UPSTREAM_URL=
 TRACES_UPSTREAM_USER=
@@ -60,6 +72,10 @@ EOL
 fi
 
 if ! grep -q '^ENVIRONMENT=' "${ENV_FILE}"; then
+    # Terminate a manually edited last line so the append doesn't join it.
+    if [ -n "$(tail -c 1 "${ENV_FILE}")" ]; then
+        echo >> "${ENV_FILE}"
+    fi
     echo "ENVIRONMENT=${ENV_NAME}" >> "${ENV_FILE}"
 fi
 
