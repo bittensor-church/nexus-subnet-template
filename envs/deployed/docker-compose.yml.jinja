@@ -130,19 +130,20 @@ services:
             type: Bearer
             credentials: $${PYLON_METRICS_TOKEN}
       remote_write:
-        - url: "http://prometheus-proxy:8000/prometheus_outbound_proxy/"
+        - url: "http://prometheus-proxy:8000/prometheus/outbound"
       EOF
       exec /entrypoint.sh --log.level=debug --storage.tsdb.retention.size=1GB'
 
   prometheus-proxy:
-    # backenddevelopersltd/bittensor-prometheus-proxy:9a0003f (= latest, Aug 2025). Its CA store and certifi
-    # still trust the distrusted emSign roots; bump once a rebuilt image is published.
-    image: backenddevelopersltd/bittensor-prometheus-proxy@sha256:324cb33e57c27a716507e05a55b507756d047bd4959243f04efb4b2683a41b13
+    # 1.0.3 rejects the compromised eMudhra intermediates (ca-certificates 20250419+deb13u1, certifi 2026.10.19).
+    # Pin a stable tag: GHCR `latest` can point at a prerelease.
+    image: ghcr.io/bittensor-church/bittensor-prometheus-proxy:1.0.3@sha256:39caeb310b1b29baef8e7794157fa66953e0e610e9bd712589bb84bf7cff2286
     restart: unless-stopped
     environment:
       CENTRAL_PROMETHEUS_PROXY_URL: "https://prometheus.bactensor.io"
       ENV: "prometheus-proxy-prod"
       SECRET_KEY: "${PROMETHEUS_PROXY_SECRET_KEY:?}"
+      BITTENSOR_NETUID: "${NETUID:?}"
       BITTENSOR_WALLET_NAME: "${BITTENSOR_WALLET_NAME:?}"
       BITTENSOR_WALLET_HOTKEY_NAME: "${BITTENSOR_WALLET_HOTKEY_NAME:?}"
       SENTRY_DSN: "${SENTRY_DSN:-}"
