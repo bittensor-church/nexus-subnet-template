@@ -135,16 +135,22 @@ attributes **deliberately carry no operator hotkey** — the observability proxy
 the structlog processors in `logging_config.py` stamp the same attributes onto every log line so logs
 and traces correlate.
 
-In deployment the validator exports to a `grafana/alloy` sidecar that tail-samples and forwards to an
-OTLP/HTTP upstream (`envs/deployed/alloy/config.alloy.jinja`). **`TRACES_UPSTREAM_*` are required by
-the sidecar** — Alloy crash-loops on startup without an endpoint and credentials. `update_compose.sh`
-keeps both `docker-compose.yml` and `alloy/config.alloy` in sync on operator hosts.
+Trace export ships **disabled**: the `grafana/alloy` sidecar in `envs/deployed/docker-compose.yml.jinja`
+is commented out and the validator runs with `VALIDATOR_OTEL_SDK_DISABLED=true`, because there is no
+traces upstream yet. Once enabled, the sidecar tail-samples spans and forwards them to an OTLP/HTTP
+upstream (`envs/deployed/alloy/config.alloy.jinja`); it then requires `TRACES_UPSTREAM_*`, as Alloy
+crash-loops without an endpoint and credentials. `update_compose.sh` already keeps both
+`docker-compose.yml` and `alloy/config.alloy` in sync on operator hosts.
 
 #### Structured logging
 
 The validator logs exclusively via `structlog`. Logging and structlog are configured in
 `validator/src/validator/logging_config.py`, tunable via `VALIDATOR_LOGGING_`-prefixed
 environment variables.
+
+Optional Sentry reporting (`SENTRY_DSN`) receives structlog events via `structlog_sentry.SentryProcessor`
+in the structlog chain; `main.py` drops the stdlib-integration copies of those records so each error is
+reported once, with its stacktrace. Pass exceptions as `exc_info=`, not as a pre-rendered string.
 
 Skip for higher level tasks that do not touch the code.
 

@@ -67,6 +67,9 @@ Written to `<WORKING_DIRECTORY>/.env` on first run:
 - `TRACES_UPSTREAM_URL` / `TRACES_UPSTREAM_USER` / `TRACES_UPSTREAM_PASSWORD` — OTLP/HTTP upstream
   endpoint and basic-auth credentials the `alloy` sidecar forwards distributed traces to: the
   observability proxy (recommended), or a Tempo backend / any OTLP-compatible upstream directly.
+  Left empty: trace export currently ships disabled (the `alloy` sidecar is commented out in
+  `docker-compose.yml` and the validator runs with `VALIDATOR_OTEL_SDK_DISABLED=true`). They become
+  required once the sidecar is enabled, as Alloy crash-loops without an endpoint and credentials.
 
 ## Custom Installation
 

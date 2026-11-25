@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import logging
 from typing import override
 
+import structlog
 from nexus.v1 import (
     Actor,
     ActorBuilder,
@@ -20,12 +20,11 @@ from nexus.v1 import (
     Routed,
     Sink,
     SinkName,
-    get_logger,
 )
 
 from validator.payload import PingInput, PongOutput
 
-logger: logging.Logger = get_logger(__name__)
+logger: structlog.stdlib.BoundLogger = structlog.stdlib.get_logger(__name__)
 
 
 class ResponseLoggerNode(Node, ActorBuilder):
@@ -62,19 +61,19 @@ class ResponseLoggerActor(ConsumerActor[ProcessedInput[Routed[PingInput], PongOu
         result = payload.output
         if isinstance(result, NexusException):
             logger.warning(
-                "Miner failed: hotkey=%s uid=%s block=%s error=%r",
-                target.hotkey,
-                target.uid,
-                payload.input.input.block_number,
-                result,
+                "miner_failed",
+                hotkey=target.hotkey,
+                uid=target.uid,
+                block=payload.input.input.block_number,
+                error=repr(result),
             )
             return
         logger.info(
-            "Pong received: hotkey=%s uid=%s block=%s ping=%s",
-            target.hotkey,
-            target.uid,
-            result.block_number,
-            result.ping,
+            "pong_received",
+            hotkey=target.hotkey,
+            uid=target.uid,
+            block=result.block_number,
+            ping=result.ping,
         )
 
 
@@ -108,4 +107,4 @@ class ErrorLoggerActor(ConsumerActor[NexusException]):
 
     @override
     def _consume(self, ctx: Context, payload: NexusException) -> None:
-        logger.exception("Pipeline error from ctx=%s: %r", ctx.id, payload, exc_info=payload)
+        logger.error("pipeline_error", context_id=str(ctx.id), error=repr(payload), exc_info=payload)

@@ -7,6 +7,7 @@ import os
 from datetime import timedelta
 from ipaddress import IPv4Address
 from pathlib import Path
+from typing import Any
 
 import click
 from dotenv import load_dotenv
@@ -79,6 +80,19 @@ class Validator(NexusValidator):
         self.connect(communicator.error, error_logger.sink)
 
 
+def _drop_structlog_duplicates(entry: Any, hint: dict[str, Any]) -> Any:
+    """Drop Sentry events/breadcrumbs for stdlib records emitted by structlog.
+
+    ``SentryProcessor`` already reports those. The logging integration would report them again, without a
+    stacktrace and with the whole event dict as the message, creating a new Sentry issue per occurrence.
+    structlog marks its records with a ``_logger`` attribute.
+    """
+    record = hint.get("log_record")
+    if isinstance(record, logging.LogRecord) and hasattr(record, "_logger"):
+        return None
+    return entry
+
+
 def _setup_sentry() -> None:
     # Optional Sentry integration. Enable by setting the SENTRY_DSN env var.
     dsn = os.environ.get("SENTRY_DSN")
@@ -94,6 +108,8 @@ def _setup_sentry() -> None:
 
     sentry_sdk.init(
         dsn=dsn,
+        before_send=_drop_structlog_duplicates,
+        before_breadcrumb=_drop_structlog_duplicates,
         integrations=[
             LitestarIntegration(),
             LoggingIntegration(event_level=logging.ERROR),
