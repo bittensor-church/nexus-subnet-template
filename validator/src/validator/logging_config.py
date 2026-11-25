@@ -10,6 +10,7 @@ reads ``VALIDATOR_LOGGING_``-prefixed environment variables.
 from __future__ import annotations
 
 import enum
+import logging
 import logging.config
 from typing import Any, Final
 
@@ -17,6 +18,7 @@ import structlog
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from structlog.processors import CallsiteParameterAdder
 from structlog.types import Processor
+from structlog_sentry import SentryProcessor
 
 from validator.otel import add_otel_context_to_structlog, add_otel_resource_to_structlog
 
@@ -101,6 +103,8 @@ def _configure_structlog() -> None:
         processors=[
             structlog.stdlib.filter_by_level,
             *_SHARED_PROCESSORS,
+            # Reports structlog events to Sentry with proper exc_info; a no-op while Sentry is not initialised.
+            SentryProcessor(level=logging.INFO, event_level=logging.ERROR),
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ],
         logger_factory=structlog.stdlib.LoggerFactory(),

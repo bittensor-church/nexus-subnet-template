@@ -148,6 +148,10 @@ The validator logs exclusively via `structlog`. Logging and structlog are config
 `validator/src/validator/logging_config.py`, tunable via `VALIDATOR_LOGGING_`-prefixed
 environment variables.
 
+Optional Sentry reporting (`SENTRY_DSN`) receives structlog events via `structlog_sentry.SentryProcessor`
+in the structlog chain; `main.py` drops the stdlib-integration copies of those records so each error is
+reported once, with its stacktrace. Pass exceptions as `exc_info=`, not as a pre-rendered string.
+
 Skip for higher level tasks that do not touch the code.
 
 ## localnet
